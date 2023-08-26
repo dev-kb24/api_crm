@@ -13,7 +13,9 @@ datasource db {
 model Users {
   userId String @id @default(auto()) @map("_id") @db.ObjectId
   email String @unique
-  name String?
+  password String
+  firstname String?
+  lastname String?
 }
 
 model Products {
