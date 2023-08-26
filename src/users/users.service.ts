@@ -40,6 +40,7 @@ export class UsersService {
         if(!await bcrypt.compare(password,userExist.password)){
             throw new ConflictException('Le mot de passe est incorrect');
         }
+        console.log(userExist);
         return userExist;
     }
 
