@@ -8,9 +8,10 @@ import { RepositoriesModule } from './repositories/repositories.module';
 import { ConfigModule } from '@nestjs/config';
 import { ProductsService } from './products/products.service';
 import { JwtModule } from '@nestjs/jwt';
+import { SuppliersModule } from './suppliers/suppliers.module';
 
 @Module({
-  imports: [UsersModule, ProductsModule, RepositoriesModule, ConfigModule.forRoot({isGlobal:true}),JwtModule],
+  imports: [UsersModule, ProductsModule, RepositoriesModule, ConfigModule.forRoot({isGlobal:true}),JwtModule, SuppliersModule],
   controllers: [AppController, ProductsController],
   providers: [AppService, ProductsService],
 })
