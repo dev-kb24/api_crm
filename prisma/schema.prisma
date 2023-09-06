@@ -23,3 +23,8 @@ model Products {
   name String @unique
   comment String?
 }
+
+model Suppliers {
+  suppliersId String @id @default(auto()) @map("_id") @db.ObjectId
+  raisonSocial String
+}
