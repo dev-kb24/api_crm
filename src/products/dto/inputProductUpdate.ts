@@ -1,7 +1,7 @@
-import {IsNotEmpty,IsString,IsOptional, IsInt} from "class-validator"
-export class InputProduct {
+import {IsString,IsOptional, IsInt} from "class-validator"
+export class InputProductUpdate {
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     readonly name : string
     @IsString()
     @IsOptional()

@@ -22,9 +22,12 @@ model Products {
   productId String @id @default(auto()) @map("_id") @db.ObjectId
   name String @unique
   comment String?
+  stock Int? @default(0)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model Suppliers {
   suppliersId String @id @default(auto()) @map("_id") @db.ObjectId
-  raisonSocial String
+  raisonSocial String 
 }
