@@ -3,8 +3,8 @@ export class OutputProduct {
      name: String
      comment : String
      stock : number
-     created_at : string
-     updated_at : string
+     created_at : Date
+     updated_at : Date
      
      constructor(partial: Partial<OutputProduct>) {
         Object.assign(this, partial);
