@@ -1,5 +1,9 @@
 export class OutputProduct {
-    readonly productId : String
-    readonly name: String
-    readonly comment : String
+     productId : String
+     name: String
+     comment : String
+     
+     constructor(partial: Partial<OutputProduct>) {
+        Object.assign(this, partial);
+    }
 }

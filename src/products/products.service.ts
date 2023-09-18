@@ -3,11 +3,13 @@ import { InputProduct } from './dto/inputProduct';
 import { RepositoriesService } from 'src/repositories/repositories.service';
 import { OutputProduct } from './dto/outputProduct';
 import { InputProductId } from './dto/inputProductId';
+import { ProductEntity } from './entities/productEntity';
 
 @Injectable()
 export class ProductsService {
     constructor(private readonly repositoriesService: RepositoriesService){}
-    async create(inputProduct: InputProduct) : Promise<OutputProduct>{
+
+    async create(inputProduct: InputProduct) : Promise<ProductEntity>{
         const {name} = inputProduct;
         const productExist = await this.repositoriesService.products.findFirst({where:{name:name}});
         if(productExist){
@@ -16,19 +18,19 @@ export class ProductsService {
         return await this.repositoriesService.products.create({data:inputProduct});
     }
 
-    async update(inputProduct: InputProduct, inputProductId : InputProductId) : Promise<OutputProduct> {
+    async update(inputProduct: InputProduct, inputProductId : InputProductId) : Promise<ProductEntity> {
         const { productId } = inputProductId;
         await this.findById(inputProductId)
         return await this.repositoriesService.products.update({where:{productId:productId},data:inputProduct});
     }
 
-    async delete(inputProductId : InputProductId) : Promise<OutputProduct> {
+    async delete(inputProductId : InputProductId) : Promise<ProductEntity> {
         const { productId } = inputProductId;
         await this.findById(inputProductId)
         return await this.repositoriesService.products.delete({where:{productId:productId}})
     }
 
-    async findById(inputProductId : InputProductId) : Promise<OutputProduct> {
+    async findById(inputProductId : InputProductId) : Promise<ProductEntity> {
         const { productId } = inputProductId;
         const product = await this.repositoriesService.products.findUnique({where:{productId:productId}});
         if(!product){
@@ -37,7 +39,7 @@ export class ProductsService {
         return product;
     }
 
-    async findAll() : Promise<OutputProduct[]> {
+    async findAll() : Promise<ProductEntity[]> {
         return await this.repositoriesService.products.findMany();
     }
 }
