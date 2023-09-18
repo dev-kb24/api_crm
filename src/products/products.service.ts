@@ -4,6 +4,7 @@ import { RepositoriesService } from 'src/repositories/repositories.service';
 import { OutputProduct } from './dto/outputProduct';
 import { InputProductId } from './dto/inputProductId';
 import { ProductEntity } from './entities/productEntity';
+import { InputProductUpdate } from './dto/inputProductUpdate';
 
 @Injectable()
 export class ProductsService {
@@ -18,7 +19,7 @@ export class ProductsService {
         return await this.repositoriesService.products.create({data:inputProduct});
     }
 
-    async update(inputProduct: InputProduct, inputProductId : InputProductId) : Promise<ProductEntity> {
+    async update(inputProduct: InputProductUpdate, inputProductId : InputProductId) : Promise<ProductEntity> {
         const { productId } = inputProductId;
         await this.findById(inputProductId)
         return await this.repositoriesService.products.update({where:{productId:productId},data:inputProduct});

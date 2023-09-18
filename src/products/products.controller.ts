@@ -5,6 +5,7 @@ import { ProductsService } from './products.service';
 import { OutputProduct } from './dto/outputProduct';
 import { InputProductId } from './dto/inputProductId';
 import { UsersGuard } from 'src/users/users.guard';
+import { InputProductUpdate } from './dto/inputProductUpdate';
 
 @Controller('products')
 export class ProductsController {
@@ -20,7 +21,7 @@ export class ProductsController {
     @UseInterceptors(ClassSerializerInterceptor)
     @UseGuards(UsersGuard)
     @Put(":productId")
-    async update(@Body() inputProduct : InputProduct, @Param() inputProductId: InputProductId) : Promise<OutputProduct> {
+    async update(@Body() inputProduct : InputProductUpdate, @Param() inputProductId: InputProductId) : Promise<OutputProduct> {
         return new OutputProduct(await this.productsService.update(inputProduct,inputProductId));
     }
 
