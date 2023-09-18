@@ -1,39 +1,52 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, Put, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
 import { SuppliersService } from './suppliers.service';
 import { InputSuppliersId } from './dto/inputSupplierId';
 import { UsersGuard } from 'src/users/users.guard';
+import { OutputSupplier } from './dto/outputSupplier';
+import { InputSupplier } from './dto/inputSupplier';
 
 @Controller('suppliers')
 export class SuppliersController {
   constructor(private readonly suppliersService: SuppliersService) {}
 
+  @UseInterceptors(ClassSerializerInterceptor) 
   @UseGuards(UsersGuard)
   @Post()
-  create(@Body() createSupplierDto: any) {
-    return this.suppliersService.create(createSupplierDto);
+  async create(@Body() inputSupplier: InputSupplier) : Promise<OutputSupplier>
+  {
+    return new OutputSupplier(await this.suppliersService.create(inputSupplier));
   }
 
+  @UseInterceptors(ClassSerializerInterceptor) 
   @UseGuards(UsersGuard)  
   @Get()
-  findAll() {
-    return this.suppliersService.findAll();
+  async findAll() : Promise<OutputSupplier[]>
+  {
+    const suppliers = await this.suppliersService.findAll();
+    return suppliers.map(supplier => new OutputSupplier(supplier));
   }
 
+  @UseInterceptors(ClassSerializerInterceptor) 
   @UseGuards(UsersGuard)  
   @Get(':suppliersId')
-  findOne(@Param() inputSuppliersId: InputSuppliersId) {
-    return this.suppliersService.findById(inputSuppliersId);
+  async findOne(@Param() inputSuppliersId: InputSuppliersId) : Promise<OutputSupplier>
+  {
+    return new OutputSupplier(await this.suppliersService.findById(inputSuppliersId));
   }
 
+  @UseInterceptors(ClassSerializerInterceptor) 
   @UseGuards(UsersGuard)
   @Put(':suppliersId')
-  update(@Param() inputSuppliersId: InputSuppliersId, @Body() updateSupplierDto: any) {
-    return this.suppliersService.update(inputSuppliersId, updateSupplierDto);
+  async update(@Param() inputSuppliersId: InputSuppliersId, @Body() inputSupplier: InputSupplier) : Promise<OutputSupplier>
+  {
+    return new OutputSupplier(await this.suppliersService.update(inputSuppliersId, inputSupplier));
   }
 
   @UseGuards(UsersGuard)
   @Delete(':suppliersId')
-  remove(@Param() inputSuppliersId: InputSuppliersId) {
-    return this.suppliersService.remove(inputSuppliersId);
+  async remove(@Param() inputSuppliersId: InputSuppliersId) : Promise<String>
+  {
+    await this.suppliersService.remove(inputSuppliersId);
+    return  "le fournisseur a été supprimé";
   }
 }

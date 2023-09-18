@@ -1,6 +1,14 @@
+import { Exclude } from 'class-transformer';
 export class OutputUser {
-    readonly userId : String
-    readonly email : String
-    readonly firstname? : String
-    readonly lastname? : String
+     userId : String
+     email : String
+     firstname : String
+     lastname : String
+     @Exclude()
+     password: String
+
+     constructor(partial: Partial<OutputUser>) {
+        Object.assign(this, partial);
+    }
+
 }

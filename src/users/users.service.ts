@@ -1,13 +1,13 @@
 import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { RepositoriesService } from 'src/repositories/repositories.service';
 import { InputUser } from './dto/inputUser';
-import { OutputUser } from './dto/outputUser';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config/dist';
 import { InputUserId } from './dto/inputUserId';
 import { InputUserPassword } from './dto/inputUserPassword';
 import { InputUserUpdate } from './dto/inputUserUpdate';
 import { JwtService } from '@nestjs/jwt';
+import { UserEntity } from './entity/userEntity';
 
 @Injectable()
 export class UsersService {
@@ -22,7 +22,7 @@ export class UsersService {
         }
     }
 
-    async signup (inputUser : InputUser) : Promise<OutputUser>{
+    async signup (inputUser : InputUser) : Promise<UserEntity>{
         const {email,password} = inputUser;
         const userExist = await this.repositoriesService.users.findFirst({where:{email:email}});
         if(userExist){
@@ -43,34 +43,36 @@ export class UsersService {
         }
         const payload = {sub:userExist.userId}
         return {
+            user:userExist,
             access_token:await this.jwtService.signAsync(payload)
         }
     }
 
-    async updatePassword(inputUserPassword : InputUserPassword, inputUserId : InputUserId) : Promise<OutputUser> {
+    async updatePassword(inputUserPassword : InputUserPassword, inputUserId : InputUserId) : Promise<UserEntity> {
         const userExist = await this.findById(inputUserId);
         const password = await bcrypt.compare(inputUserPassword.oldPassword,userExist.password);
         if(!password){
             throw new ConflictException('Le mot de passe est incorrect');
         }
-        return await this.repositoriesService.users.update({where:{userId:inputUserId.userId},data:{password:inputUserPassword.newPassword}});
+        const newPassword = await this.hashPassword(inputUserPassword.newPassword);
+        return await this.repositoriesService.users.update({where:{userId:inputUserId.userId},data:{password:newPassword}});
     }
 
-    async update(inputUserUpdate : InputUserUpdate, inputUserId:InputUserId) : Promise<OutputUser>{
+    async update(inputUserUpdate : InputUserUpdate, inputUserId:InputUserId) : Promise<UserEntity>{
         await this.findById(inputUserId);
         return await this.repositoriesService.users.update({where:{userId:inputUserId.userId},data:inputUserUpdate});
     }
 
-    async getProfil(inputUserId:InputUserId) : Promise<any>{
+    async getProfil(inputUserId:InputUserId) : Promise<UserEntity>{
         return await this.findById(inputUserId);
     }
 
-    async delete(inputUserId : InputUserId) : Promise<OutputUser>{
+    async delete(inputUserId : InputUserId) : Promise<UserEntity>{
         await this.findById(inputUserId);
         return await this.repositoriesService.users.delete({where:{userId:inputUserId.userId}})
     }
 
-    async findById(inputUserId : InputUserId) : Promise<InputUser> {
+    async findById(inputUserId : InputUserId) : Promise<UserEntity> {
         const { userId } = inputUserId;
         const user = await this.repositoriesService.users.findUnique({where:{userId:userId}});
         if(!user){
