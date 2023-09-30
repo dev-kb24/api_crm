@@ -5,7 +5,9 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  if(process.env.NODE_ENV === 'dev'){
+    app.enableCors();
+  }
   const config = new DocumentBuilder()
     .setTitle('CRM API')
     .setDescription('La liste des routes du CRM')
