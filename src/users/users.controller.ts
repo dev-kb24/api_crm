@@ -51,4 +51,10 @@ export class UsersController {
         return "L'utilisateur a été supprimé"
     }
 
+    @UseGuards(UsersGuard)
+    @Get('access')
+    async access(){
+        return "Vous etes Autorisé !";
+    }
+
 }
