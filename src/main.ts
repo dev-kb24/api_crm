@@ -24,6 +24,8 @@ async function bootstrap() {
     whitelist: true
   }))
 
+  
+  app.getHttpAdapter();
   await app.listen(3000);
 }
 bootstrap();
