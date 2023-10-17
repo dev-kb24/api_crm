@@ -1,7 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InputProduct } from './dto/inputProduct';
 import { RepositoriesService } from 'src/repositories/repositories.service';
-import { OutputProduct } from './dto/outputProduct';
 import { InputProductId } from './dto/inputProductId';
 import { ProductEntity } from './entities/productEntity';
 import { InputProductUpdate } from './dto/inputProductUpdate';
@@ -33,7 +32,7 @@ export class ProductsService {
 
     async findById(inputProductId : InputProductId) : Promise<ProductEntity> {
         const { productId } = inputProductId;
-        const product = await this.repositoriesService.products.findUnique({where:{productId:productId}});
+        const product = await this.repositoriesService.products.findUnique({where:{productId:productId},include:{order:true}});
         if(!product){
             throw new NotFoundException(`ProductId : ${productId} not found`);
         }
@@ -41,6 +40,6 @@ export class ProductsService {
     }
 
     async findAll() : Promise<ProductEntity[]> {
-        return await this.repositoriesService.products.findMany();
+        return await this.repositoriesService.products.findMany({include:{order:true}});
     }
 }
