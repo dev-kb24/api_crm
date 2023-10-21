@@ -16,7 +16,7 @@ model Users {
   password String
   firstname String?
   lastname String?
-  ordersId String[] @db.ObjectId
+  ordersId String[] @db.ObjectId 
   order Order[] @relation(name: "usersOrder",fields: [ordersId],references:[orderId])
 }
 

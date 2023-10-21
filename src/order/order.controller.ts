@@ -12,8 +12,7 @@ export class OrderController {
   @Post()
   async create(@Body() createOrderDto: CreateOrderDto) : Promise<OutputOrder> 
   {
-    return await this.orderService.create(createOrderDto);
-    //return new OutputOrder(await this.orderService.create(createOrderDto));
+    return new OutputOrder(await this.orderService.create(createOrderDto));
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -24,18 +23,22 @@ export class OrderController {
     return orders.map(order => new OutputOrder(order))
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.orderService.findOne(+id);
+  async findOne(@Param('id') orderId: string) {
+    return new OutputOrder(await this.orderService.findById(orderId));
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.orderService.update(+id, updateOrderDto);
+  async update(@Param('id') orderId: string, @Body() updateOrderDto: UpdateOrderDto) : Promise<OutputOrder>
+  {
+    return new OutputOrder(await this.orderService.update(orderId, updateOrderDto));
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.orderService.remove(+id);
+  async remove(@Param('id') orderId: string) {
+    await this.orderService.delete(orderId);
+    return 'Le produit à été supprimé'
   }
 }

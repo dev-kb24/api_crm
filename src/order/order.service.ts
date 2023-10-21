@@ -9,15 +9,14 @@ export class OrderService {
 
   constructor(private readonly repositoriesService: RepositoriesService){}
 
-  async create(createOrderDto: CreateOrderDto) : Promise<any>
+  async create(createOrderDto: CreateOrderDto) : Promise<OrderEntity>
   {
-      let orderCreated : any;
       const {name} = createOrderDto;
       
       await this.searchName(name);
 
       try {
-        orderCreated = await this.repositoriesService.order.create
+         return await this.repositoriesService.order.create
       (
         {
           data:
@@ -32,7 +31,6 @@ export class OrderService {
           include:{products:true,users:true}
         }
       )
-      return orderCreated;
       } catch (error) {
         throw new BadRequestException(error);
       }
@@ -43,16 +41,86 @@ export class OrderService {
     return await this.repositoriesService.order.findMany({include:{products:true,users:true}});
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  async findById(orderId: string) {
+    const order = await this.repositoriesService.order.findUnique({where:{orderId:orderId},include:{users:true,products:true}});
+    if(!order){
+        throw new NotFoundException(`OrderId : ${orderId} not found`);
+    }
+    return order;
   }
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
+  async update(orderId: string, updateOrderDto: UpdateOrderDto) {
+
+    const order = await this.findById(orderId);
+
+    const userIdDisconnect = order.users.map((user) => user.userId).filter((userId) => !updateOrderDto.usersId.includes(userId));
+    const productIdDisconnect = order.products.map((product) => product.productId).filter((productId) => !updateOrderDto.productsId.includes(productId));
+      
+    try {
+      const orderUpdated = await this.repositoriesService.order.update
+      (
+        {
+          where:{orderId:orderId},
+          data:
+          {
+            ...updateOrderDto,
+            products:{
+             set:updateOrderDto.productsId.map((productId) => ({ productId }))
+            },
+            users:{
+              set:updateOrderDto.usersId.map((userId) => ({ userId }))
+            }
+          },
+          include:{products:true,users:true}
+        }
+      )
+
+      await this.updateUser(userIdDisconnect,orderId);
+
+      await this.updateProduct(productIdDisconnect,orderId);
+
+      return orderUpdated;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+  async delete(orderId: string) : Promise<OrderEntity>
+  {
+    const order = await this.findById(orderId);
+    try {
+      const orderDeleted = await this.repositoriesService.order.delete({
+        where: { orderId: orderId },
+        include: { products: true, users: true }
+      });
+      await this.updateProduct(orderDeleted.productsId,orderId);
+      await this.updateUser(orderDeleted.usersId,orderId);
+      return order;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  private async updateProduct(productIdDisconnect : Array<string>,orderId : string) : Promise<void>
+  {
+    const products = await this.repositoriesService.products.findMany({ where: { productId: { in: productIdDisconnect } } });
+    const productsIds = products.map((product) => product.productId);
+    const ordersIds = products.map((product) => product.ordersId.filter((id) => id !== orderId));
+    await this.repositoriesService.products.updateMany({
+      where: { productId: { in: productsIds } },
+      data: { ordersId: { set: ordersIds.flat() } },
+    });
+  }
+
+  private async updateUser(userIdDisconnect : Array<string>,orderId : string) : Promise<void>
+  {
+    const users = await this.repositoriesService.users.findMany({ where: { userId: { in: userIdDisconnect } } });
+    const userIds = users.map((user) => user.userId);
+    const ordersIds = users.map((user) => user.ordersId.filter((id) => id !== orderId));
+    await this.repositoriesService.users.updateMany({
+      where: { userId: { in: userIds } },
+      data: { ordersId: { set: ordersIds.flat() } },
+    });
   }
 
   private async searchName(name: string) : Promise<void>
