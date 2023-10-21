@@ -16,18 +16,56 @@ model Users {
   password String
   firstname String?
   lastname String?
+  ordersId String[] @db.ObjectId 
+  order Order[] @relation(name: "usersOrder",fields: [ordersId],references:[orderId])
 }
+
 
 model Products {
   productId String @id @default(auto()) @map("_id") @db.ObjectId
   name String @unique
   comment String?
+  price Float?
   stock Int? @default(0)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+  ordersId String[] @db.ObjectId
+  order Order[] @relation(name: "productsOrder",fields: [ordersId],references:[orderId])
 }
+
 
 model Suppliers {
   suppliersId String @id @default(auto()) @map("_id") @db.ObjectId
   raisonSocial String 
+}
+
+model Order {
+  orderId String @id @default(auto()) @map("_id") @db.ObjectId
+  name String @unique
+  comment String?
+  address Address
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  started_at DateTime?
+  finished_at DateTime?
+  authorId String @db.ObjectId
+  productsId String[] @db.ObjectId
+  products Products[]  @relation(name: "productsOrder",fields: [productsId],references: [productId])
+  usersId String[] @db.ObjectId
+  users Users[] @relation(name: "usersOrder",fields: [usersId],references: [userId])
+  picture_before Pictures[]
+  picture_after Pictures[]
+}
+
+type Address {
+  street String
+  city String
+  zip String
+}
+
+type Pictures {
+  path String
+  name String
+  format String
+  created_at DateTime @default(now())
 }
