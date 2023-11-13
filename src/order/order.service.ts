@@ -1,8 +1,8 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { RepositoriesService } from 'src/repositories/repositories.service';
-import { OrderEntity } from './entities/order.entity';
+import { RepositoriesService } from "@/repositories/repositories.service"
+import { OrderEntity } from '@/order/entities/order.entity';
 
 @Injectable()
 export class OrderService {

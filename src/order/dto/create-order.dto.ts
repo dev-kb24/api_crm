@@ -1,6 +1,6 @@
 import {IsNotEmpty,IsString,IsOptional, IsDateString, IsObject, IsArray} from "class-validator"
-import { AddressEntity } from "../entities/address.entity"
-import { PicturesEntity } from "../entities/pictures.entity"
+import { AddressEntity } from "@/order/entities/address.entity"
+import { PicturesEntity } from "@/order/entities/pictures.entity"
 export class CreateOrderDto {
 
     @IsString()

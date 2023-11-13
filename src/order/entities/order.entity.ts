@@ -1,6 +1,6 @@
-import { ProductEntity } from "src/products/entities/productEntity"
-import { AddressEntity } from "./address.entity"
-import { PicturesEntity } from "./pictures.entity"
+import { ProductEntity } from "@/products/entities/productEntity"
+import { AddressEntity } from "@/order/entities/address.entity"
+import { PicturesEntity } from "@/order/entities/pictures.entity"
 export class OrderEntity {
     readonly orderId : string
     readonly name: string
