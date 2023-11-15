@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InputSuppliersId } from './dto/inputSupplierId';
-import { RepositoriesService } from 'src/repositories/repositories.service';
+import { RepositoriesService } from '@/repositories/repositories.service';
 import { InputSupplier } from './dto/inputSupplier';
 import { SuppliersEntity } from './entities/suppliersEntity';
 

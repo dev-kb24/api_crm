@@ -4,7 +4,7 @@ import { InputProduct } from './dto/inputProduct';
 import { ProductsService } from './products.service';
 import { OutputProduct } from './dto/outputProduct';
 import { InputProductId } from './dto/inputProductId';
-import { UsersGuard } from 'src/users/users.guard';
+import { UsersGuard } from '@/users/users.guard';
 import { InputProductUpdate } from './dto/inputProductUpdate';
 
 @Controller('products')

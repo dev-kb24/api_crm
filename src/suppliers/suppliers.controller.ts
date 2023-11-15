@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Param, Delete, UseGuards, Put, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
 import { SuppliersService } from './suppliers.service';
 import { InputSuppliersId } from './dto/inputSupplierId';
-import { UsersGuard } from 'src/users/users.guard';
+import { UsersGuard } from '@/users/users.guard';
 import { OutputSupplier } from './dto/outputSupplier';
 import { InputSupplier } from './dto/inputSupplier';
 

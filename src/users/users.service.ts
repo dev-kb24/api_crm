@@ -1,5 +1,5 @@
 import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { RepositoriesService } from 'src/repositories/repositories.service';
+import { RepositoriesService } from '@/repositories/repositories.service';
 import { InputUser } from './dto/inputUser';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config/dist';

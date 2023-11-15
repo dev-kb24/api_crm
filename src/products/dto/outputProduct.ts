@@ -1,5 +1,5 @@
 import { Exclude } from "class-transformer"
-import { OrderEntity } from "src/order/entities/order.entity"
+import { OrderEntity } from "@/order/entities/order.entity"
 export class OutputProduct {
      productId : String
      name: String
