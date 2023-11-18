@@ -1,10 +1,9 @@
 import { Body, Controller, Post,Put,Delete, Param, UseGuards, Get, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
-import { InputUser } from './dto/inputUser';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
-import { OutputUser } from './dto/outputUser';
-import { InputUserPassword } from './dto/inputUserPassword';
-import { InputUserId } from './dto/inputUserId';
-import { InputUserUpdate } from './dto/inputUserUpdate';
+import { OutputUserDto } from './dto/output-user.dto';
+import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersGuard } from './users.guard';
 
 @Controller('users')
@@ -13,47 +12,49 @@ export class UsersController {
 
     @UseInterceptors(ClassSerializerInterceptor) 
     @Post('signup')
-    async signup(@Body() inputUser : InputUser) : Promise<OutputUser> {
-        return new OutputUser(await this.userService.signup(inputUser));
+    async signup(@Body() createUserDto : CreateUserDto) : Promise<OutputUserDto> {
+        return new OutputUserDto(await this.userService.signup(createUserDto));
     }
 
     @UseInterceptors(ClassSerializerInterceptor)
     @Post('signin')
-    async signin(@Body() inputUser : InputUser) : Promise<any> {
-        let signin =  await this.userService.signin(inputUser);
-        signin.user = new OutputUser(signin.user);
-        return signin;
+    async signin(@Body() createUserDto : CreateUserDto) : Promise<OutputUserDto> {
+        return new OutputUserDto(await this.userService.signin(createUserDto))
     }
 
-    @Put('password/:userId')
-    async updatePassword(@Body() inputUserPassword : InputUserPassword, @Param() inputUserId : InputUserId) : Promise<any>{
-        await this.userService.updatePassword(inputUserPassword,inputUserId);
+    @UseInterceptors(ClassSerializerInterceptor)
+    @UseGuards(UsersGuard)
+    @Put('password/:id')
+    async updatePassword(@Body() updateUserPasswordDto : UpdateUserPasswordDto, @Param('id') userId : string) : Promise<String>{
+        await this.userService.updatePassword(updateUserPasswordDto,userId);
         return "Le mot de passe a été modifié";
     }
 
     @UseInterceptors(ClassSerializerInterceptor)
     @UseGuards(UsersGuard)
-    @Get('getProfil/:userId')
-    async getProfil(@Param() inputUserId : InputUserId) : Promise<OutputUser>{
-        return new OutputUser(await this.userService.getProfil(inputUserId));
+    @Get('getProfil/:id')
+    async getProfil(@Param('id') userId : string) : Promise<OutputUserDto>{
+        return new OutputUserDto(await this.userService.getProfil(userId));
     }
 
+    @UseInterceptors(ClassSerializerInterceptor)
     @UseGuards(UsersGuard)
-    @Put(':userId')
-    async update(@Body() inputUserUpdate : InputUserUpdate, @Param() inputUserId : InputUserId) : Promise<OutputUser>{
-        return new OutputUser(await this.userService.update(inputUserUpdate,inputUserId));
+    @Put(':id')
+    async update(@Body() updateUserDto : UpdateUserDto, @Param('id') userId : string) : Promise<OutputUserDto>{
+        return new OutputUserDto(await this.userService.update(updateUserDto,userId));
     }
 
+    @UseInterceptors(ClassSerializerInterceptor)
     @UseGuards(UsersGuard)
-    @Delete(':userId')
-    async delete(@Param() inputUserId : InputUserId) : Promise<String>{
-        await this.userService.delete(inputUserId);
+    @Delete(':id')
+    async delete(@Param('id') userId : string) : Promise<String>{
+        await this.userService.delete(userId);
         return "L'utilisateur a été supprimé"
     }
 
     @UseGuards(UsersGuard)
     @Get('access')
-    async access(){
+    access() : string {
         return "Vous etes Autorisé !";
     }
 

@@ -166,4 +166,85 @@ describe('testing (e2e)', () => {
       expect(result.status).toEqual(200);
     });
   });
-});
+
+  describe("usersController", () => {
+    let userId : string;
+
+    it("/users/signup (POST)", async () => {
+      const user = {
+        email:`test@test.fr`,	
+        password:`test`,
+        firstname:`test`,
+        lastname:`test`,
+      }
+      const result = await request(app.getHttpServer())
+      .post("/users/signup")
+      .send(user)
+      expect(result.status).toEqual(201);
+      expect(result.body).toHaveProperty("userId");
+      expect(result.body).toHaveProperty("email",user.email);
+      userId = result.body.userId;
+    });
+
+    it("/users/signin (POST)", async () => {
+      const user = {
+        email:`test@test.fr`,	
+        password:`test`
+      }
+      const result = await request(app.getHttpServer())
+      .post("/users/signin")
+      .send(user)
+      expect(result.status).toEqual(201);
+      expect(result.body).toHaveProperty("user");
+      expect(result.body).toHaveProperty("access_token");
+    });
+
+    it("/users/getProfil/:id (GET)", async () => {
+      const result = await request(app.getHttpServer())
+      .get(`/users/getProfil/${userId}`)
+      .set("Authorization",`Bearer ${token}`)
+
+      expect(result.status).toEqual(200);
+      expect(result.body).toHaveProperty("userId");
+    });
+
+    it('/users/password/:id (PUT)', async () => {
+        const updatepassword = {
+          oldPassword:`test`,
+          newPassword:`test_1`
+        }
+        const result = await request(app.getHttpServer())
+        .put(`/users/password/${userId}`)
+        .set("Authorization",`Bearer ${token}`)
+        .send(updatepassword)
+        expect(result.status).toEqual(200);
+        expect(result.text).toEqual("Le mot de passe a été modifié");
+    });
+
+    it("/users/:id (PUT)", async () => {
+      const user = {
+        email:"test@test.fr",
+        firstname:"test_1",
+        lastname:"test_1"
+      }
+      const result = await request(app.getHttpServer())
+      .put(`/users/${userId}`)
+      .set("Authorization",`Bearer ${token}`)
+      .send(user)
+      expect(result.status).toEqual(200);
+      expect(result.body).toHaveProperty("userId");
+      expect(result.body).toHaveProperty("email",user.email);
+      expect(result.body).toHaveProperty("firstname",user.firstname);
+      expect(result.body).toHaveProperty("lastname",user.lastname);
+  });
+
+    it("/users/:id (DELETE)", async () => {
+      const result = await request(app.getHttpServer())
+      .delete(`/users/${userId}`)
+      .set("Authorization",`Bearer ${token}`)
+      expect(result.status).toEqual(200);
+      expect(result.text).toEqual("L'utilisateur a été supprimé");
+    });
+  
+  })
+;});
