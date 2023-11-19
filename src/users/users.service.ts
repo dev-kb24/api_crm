@@ -1,11 +1,10 @@
 import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { RepositoriesService } from 'src/repositories/repositories.service';
-import { InputUser } from './dto/inputUser';
+import { RepositoriesService } from '@/repositories/repositories.service';
+import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config/dist';
-import { InputUserId } from './dto/inputUserId';
-import { InputUserPassword } from './dto/inputUserPassword';
-import { InputUserUpdate } from './dto/inputUserUpdate';
+import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntity } from './entity/userEntity';
 
@@ -18,22 +17,22 @@ export class UsersService {
             const salt = await bcrypt.genSalt(parseInt(this.configService.get('SALT_ROUNDS')))
             return await bcrypt.hash(password,salt);
         } catch (error) {
-            throw new ConflictException("Erreur lors du hashage du password" + error);
+            throw new ConflictException("Erreur lors du hashage du password " + error);
         }
     }
 
-    async signup (inputUser : InputUser) : Promise<UserEntity>{
-        const {email,password} = inputUser;
+    async signup (createUserDto : CreateUserDto) : Promise<UserEntity>{
+        const {email,password} = createUserDto;
         const userExist = await this.repositoriesService.users.findFirst({where:{email:email}});
         if(userExist){
             throw new ConflictException('User already exist');
         }
-        inputUser.password = await this.hashPassword(password);
-        return await this.repositoriesService.users.create({data:inputUser});
+        createUserDto.password = await this.hashPassword(password);
+        return await this.repositoriesService.users.create({data:createUserDto});
     }
 
-    async signin(inputUser : InputUser) : Promise<any>{
-        const {email,password} = inputUser;
+    async signin(createUserDto : CreateUserDto) : Promise<any>{
+        const {email,password} = createUserDto;
         const userExist = await this.repositoriesService.users.findFirst({where:{email:email}});
         if(!userExist){
             throw new NotFoundException('User not found');
@@ -48,32 +47,31 @@ export class UsersService {
         }
     }
 
-    async updatePassword(inputUserPassword : InputUserPassword, inputUserId : InputUserId) : Promise<UserEntity> {
-        const userExist = await this.findById(inputUserId);
-        const password = await bcrypt.compare(inputUserPassword.oldPassword,userExist.password);
+    async updatePassword(updateUserPasswordDto : UpdateUserPasswordDto, userId : string) : Promise<UserEntity> {
+        const userExist = await this.findById(userId);
+        const password = await bcrypt.compare(updateUserPasswordDto.oldPassword,userExist.password);
         if(!password){
             throw new ConflictException('Le mot de passe est incorrect');
         }
-        const newPassword = await this.hashPassword(inputUserPassword.newPassword);
-        return await this.repositoriesService.users.update({where:{userId:inputUserId.userId},data:{password:newPassword}});
+        const newPassword = await this.hashPassword(updateUserPasswordDto.newPassword);
+        return await this.repositoriesService.users.update({where:{userId:userId},data:{password:newPassword}});
     }
 
-    async update(inputUserUpdate : InputUserUpdate, inputUserId:InputUserId) : Promise<UserEntity>{
-        await this.findById(inputUserId);
-        return await this.repositoriesService.users.update({where:{userId:inputUserId.userId},data:inputUserUpdate});
+    async update(updateUserDto : UpdateUserDto, userId : string) : Promise<UserEntity>{
+        await this.findById(userId);
+        return await this.repositoriesService.users.update({where:{userId:userId},data:updateUserDto});
     }
 
-    async getProfil(inputUserId:InputUserId) : Promise<UserEntity>{
-        return await this.findById(inputUserId);
+    async getProfil(userId:string) : Promise<UserEntity>{
+        return await this.findById(userId);
     }
 
-    async delete(inputUserId : InputUserId) : Promise<UserEntity>{
-        await this.findById(inputUserId);
-        return await this.repositoriesService.users.delete({where:{userId:inputUserId.userId}})
+    async delete(userId : string) : Promise<UserEntity>{
+        await this.findById(userId);
+        return await this.repositoriesService.users.delete({where:{userId:userId}})
     }
 
-    async findById(inputUserId : InputUserId) : Promise<UserEntity> {
-        const { userId } = inputUserId;
+    async findById(userId : string) : Promise<UserEntity> {
         const user = await this.repositoriesService.users.findUnique({where:{userId:userId}});
         if(!user){
             throw new NotFoundException(`UserId : ${userId} not found`);

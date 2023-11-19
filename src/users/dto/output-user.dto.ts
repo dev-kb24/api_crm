@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-export class OutputUser {
+export class OutputUserDto {
      userId : String
      email : String
      firstname : String
@@ -7,7 +7,7 @@ export class OutputUser {
      @Exclude()
      password: String
 
-     constructor(partial: Partial<OutputUser>) {
+     constructor(partial: Partial<OutputUserDto>) {
         Object.assign(this, partial);
     }
 

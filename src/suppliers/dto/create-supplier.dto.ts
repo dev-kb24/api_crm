@@ -1,5 +1,5 @@
 import {IsString,IsOptional} from "class-validator"
-export class InputSupplier {
+export class CreateSupplierDto {
     @IsOptional()
     @IsString()
     readonly raisonSocial : string

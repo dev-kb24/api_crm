@@ -1,21 +1,21 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { InputSuppliersId } from './dto/inputSupplierId';
-import { RepositoriesService } from 'src/repositories/repositories.service';
-import { InputSupplier } from './dto/inputSupplier';
+import { RepositoriesService } from '@/repositories/repositories.service';
+import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { SuppliersEntity } from './entities/suppliersEntity';
+import { UpdateSupplierDto } from './dto/update-supplier.dto';
 
 @Injectable()
 export class SuppliersService {
   constructor(private readonly repositoriesService: RepositoriesService){}
 
-  async create(inputSupplier: InputSupplier) : Promise<SuppliersEntity>
+  async create(createSupplierDto: CreateSupplierDto) : Promise<SuppliersEntity>
   {
-    const {raisonSocial} = inputSupplier;
+    const {raisonSocial} = createSupplierDto;
         const supplierExist = await this.repositoriesService.suppliers.findFirst({where:{raisonSocial:raisonSocial}})
         if(supplierExist){
             throw new ConflictException("supplier already exist");
         }
-        return await this.repositoriesService.suppliers.create({data:inputSupplier});
+        return await this.repositoriesService.suppliers.create({data:createSupplierDto});
   }
 
   async findAll() : Promise<SuppliersEntity[]>
@@ -23,27 +23,24 @@ export class SuppliersService {
     return await this.repositoriesService.suppliers.findMany();
   }
 
-  async findById(inputSuppliersId: InputSuppliersId) : Promise<SuppliersEntity>
+  async findById(supplierId: string) : Promise<SuppliersEntity>
   {
-    const { suppliersId } = inputSuppliersId;
-      const supplier = await this.repositoriesService.suppliers.findUnique({where:{suppliersId:suppliersId}});
+      const supplier = await this.repositoriesService.suppliers.findUnique({where:{suppliersId:supplierId}});
       if(!supplier){
-          throw new NotFoundException(`SupplierId : ${suppliersId} not found`);
+          throw new NotFoundException(`SupplierId : ${supplierId} not found`);
       }
       return supplier;
   }
 
-  async update(inputSuppliersId: InputSuppliersId, updateSupplierDto: any) : Promise<SuppliersEntity>
+  async update(supplierId: string, updateSupplierDto: UpdateSupplierDto) : Promise<SuppliersEntity>
   {
-      const { suppliersId } = inputSuppliersId;
-      await this.findById(inputSuppliersId)
-      return await this.repositoriesService.suppliers.update({where:{suppliersId:suppliersId},data:updateSupplierDto});
+      await this.findById(supplierId)
+      return await this.repositoriesService.suppliers.update({where:{suppliersId:supplierId},data:updateSupplierDto});
   }
 
- async remove(inputSuppliersId: InputSuppliersId) : Promise<SuppliersEntity>
+ async remove(supplierId: string) : Promise<SuppliersEntity>
  {
-      const { suppliersId } = inputSuppliersId;
-      await this.findById(inputSuppliersId)
-      return await this.repositoriesService.suppliers.delete({where:{suppliersId:suppliersId}})
+      await this.findById(supplierId)
+      return await this.repositoriesService.suppliers.delete({where:{suppliersId:supplierId}})
   }
 }

@@ -1,5 +1,5 @@
 import {IsNotEmpty,IsString} from "class-validator"
-export class InputUserPassword {
+export class UpdateUserPasswordDto {
     @IsString()
     @IsNotEmpty()
     readonly newPassword : string

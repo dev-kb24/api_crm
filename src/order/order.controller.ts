@@ -1,44 +1,50 @@
-import { Controller, Get, Post, Body, Param, Delete, UseInterceptors, ClassSerializerInterceptor, Put } from '@nestjs/common';
-import { OrderService } from './order.service';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
-import { OutputOrder } from './dto/outputOrder';
+import { Controller, Get, Post, Body, Param, Delete, UseInterceptors, ClassSerializerInterceptor, Put, UseGuards } from '@nestjs/common';
+import { OrderService } from '@/order/order.service';
+import { CreateOrderDto } from '@/order/dto/create-order.dto';
+import { UpdateOrderDto } from '@/order/dto/update-order.dto';
+import { OutputOrderDto } from '@/order/dto/output-order.dto';
+import { UsersGuard } from '@/users/users.guard';
 
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @UseInterceptors(ClassSerializerInterceptor)
+  @UseGuards(UsersGuard) 
   @Post()
-  async create(@Body() createOrderDto: CreateOrderDto) : Promise<OutputOrder> 
+  async create(@Body() createOrderDto: CreateOrderDto) : Promise<OutputOrderDto> 
   {
-    return new OutputOrder(await this.orderService.create(createOrderDto));
+    return new OutputOrderDto(await this.orderService.create(createOrderDto));
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
+  @UseGuards(UsersGuard) 
   @Get()
-  async findAll() : Promise<OutputOrder[]>
+  async findAll() : Promise<OutputOrderDto[]>
   {
     const orders = await this.orderService.findAll();
-    return orders.map(order => new OutputOrder(order))
+    return orders.map(order => new OutputOrderDto(order))
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
+  @UseGuards(UsersGuard) 
   @Get(':id')
   async findOne(@Param('id') orderId: string) {
-    return new OutputOrder(await this.orderService.findById(orderId));
+    return new OutputOrderDto(await this.orderService.findById(orderId));
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
+  @UseGuards(UsersGuard) 
   @Put(':id')
-  async update(@Param('id') orderId: string, @Body() updateOrderDto: UpdateOrderDto) : Promise<OutputOrder>
+  async update(@Param('id') orderId: string, @Body() updateOrderDto: UpdateOrderDto) : Promise<OutputOrderDto>
   {
-    return new OutputOrder(await this.orderService.update(orderId, updateOrderDto));
+    return new OutputOrderDto(await this.orderService.update(orderId, updateOrderDto));
   }
-
+  
+  @UseGuards(UsersGuard) 
   @Delete(':id')
-  async remove(@Param('id') orderId: string) {
+  async delete(@Param('id') orderId: string) {
     await this.orderService.delete(orderId);
-    return 'Le produit à été supprimé'
+    return 'Le devis à été supprimé'
   }
 }

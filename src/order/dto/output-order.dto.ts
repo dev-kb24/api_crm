@@ -1,9 +1,9 @@
-import { ProductEntity } from "src/products/entities/productEntity"
-import { AddressEntity } from "../entities/address.entity"
-import { PicturesEntity } from "../entities/pictures.entity"
+import { ProductEntity } from "@/products/entities/productEntity"
+import { AddressEntity } from "@/order/entities/address.entity"
+import { PicturesEntity } from "@/order/entities/pictures.entity"
 import { Exclude } from "class-transformer"
 
-export class OutputOrder {
+export class OutputOrderDto {
     readonly name: string
     readonly comment: string
     readonly created_at: Date
@@ -21,7 +21,7 @@ export class OutputOrder {
     readonly picture_before: PicturesEntity|Object
     readonly picture_after: PicturesEntity|Object
     
-    constructor(partial: Partial<OutputOrder>) {
+    constructor(partial: Partial<OutputOrderDto>) {
        Object.assign(this, partial);
    }
 }
