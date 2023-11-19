@@ -17,7 +17,7 @@ export class UsersService {
             const salt = await bcrypt.genSalt(parseInt(this.configService.get('SALT_ROUNDS')))
             return await bcrypt.hash(password,salt);
         } catch (error) {
-            throw new ConflictException("Erreur lors du hashage du password" + error);
+            throw new ConflictException("Erreur lors du hashage du password " + error);
         }
     }
 

@@ -43,8 +43,8 @@ export class OrderController {
   
   @UseGuards(UsersGuard) 
   @Delete(':id')
-  async remove(@Param('id') orderId: string) {
+  async delete(@Param('id') orderId: string) {
     await this.orderService.delete(orderId);
-    return 'Le produit à été supprimé'
+    return 'Le devis à été supprimé'
   }
 }

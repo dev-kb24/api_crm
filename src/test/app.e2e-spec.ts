@@ -3,6 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '@/app.module';
 import { v4 as uuidv4 } from 'uuid';
+import * as bcrypt from 'bcrypt';
 
 describe('testing (e2e)', () => {
   let app: INestApplication;
@@ -16,6 +17,10 @@ describe('testing (e2e)', () => {
     await app.init();
     const result = await request(app.getHttpServer()).post("/users/signin").send({email:"admin@admin.fr",password:"admin"});
     token = result.body.access_token;
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe("AppController", () => {
@@ -186,6 +191,37 @@ describe('testing (e2e)', () => {
       userId = result.body.userId;
     });
 
+    it("/users/signup (POST) - throw error (hashage)", async () => {
+      jest.spyOn(bcrypt, 'genSalt').mockResolvedValue('test' as never);
+      jest.spyOn(bcrypt, 'hash').mockRejectedValue('test' as never);
+
+      const user = {
+        email:`test@test2.fr`,	
+        password:`test`,
+        firstname:`test`,
+        lastname:`test`,
+      }
+      const result = await request(app.getHttpServer())
+      .post("/users/signup")
+      .send(user)
+      expect(result.status).toEqual(409);
+      expect(result.body.message).toEqual("Erreur lors du hashage du password test");
+    });
+
+    it("/users/signup (POST) - throw error (exist)", async () => {
+      const user = {
+        email:`test@test.fr`,	
+        password:`test`,
+        firstname:`test`,
+        lastname:`test`,
+      }
+      const result = await request(app.getHttpServer())
+      .post("/users/signup")
+      .send(user)
+      expect(result.status).toEqual(409);
+      expect(result.body.message).toEqual("User already exist");
+    });
+
     it("/users/signin (POST)", async () => {
       const user = {
         email:`test@test.fr`,	
@@ -199,6 +235,30 @@ describe('testing (e2e)', () => {
       expect(result.body).toHaveProperty("access_token");
     });
 
+    it("/users/signin (POST) - throw error (user not found)", async () => {
+      const user = {
+        email:`test@test3.fr`,	
+        password:`test`
+      }
+      const result = await request(app.getHttpServer())
+      .post("/users/signin")
+      .send(user)
+      expect(result.status).toEqual(404);
+      expect(result.body.message).toEqual("User not found");
+    });
+
+    it("/users/signin (POST) - throw error (password incorrect)", async () => {
+      const user = {
+        email:`test@test.fr`,	
+        password:`test3`
+      }
+      const result = await request(app.getHttpServer())
+      .post("/users/signin")
+      .send(user)
+      expect(result.status).toEqual(401);
+      expect(result.body.message).toEqual("Le mot de passe est incorrect");
+    });
+
     it("/users/getProfil/:id (GET)", async () => {
       const result = await request(app.getHttpServer())
       .get(`/users/getProfil/${userId}`)
@@ -206,6 +266,15 @@ describe('testing (e2e)', () => {
 
       expect(result.status).toEqual(200);
       expect(result.body).toHaveProperty("userId");
+    });
+
+    it("/users/getProfil/:id (GET) - throw error", async () => {
+      const idUserFake = "123456789123456789123456"
+      const result = await request(app.getHttpServer())
+      .get(`/users/getProfil/${idUserFake}`)
+      .set("Authorization",`Bearer ${token}`)
+      expect(result.status).toEqual(404);
+      expect(result.body.message).toEqual(`UserId : ${idUserFake} not found`);
     });
 
     it('/users/password/:id (PUT)', async () => {
@@ -219,6 +288,19 @@ describe('testing (e2e)', () => {
         .send(updatepassword)
         expect(result.status).toEqual(200);
         expect(result.text).toEqual("Le mot de passe a été modifié");
+    });
+
+    it('/users/password/:id (PUT) - throw error (password incorrect)', async () => {
+      const updatepassword = {
+        oldPassword:`test_2`,
+        newPassword:`test_1`
+      }
+      const result = await request(app.getHttpServer())
+      .put(`/users/password/${userId}`)
+      .set("Authorization",`Bearer ${token}`)
+      .send(updatepassword)
+      expect(result.status).toEqual(409);
+      expect(result.body.message).toEqual("Le mot de passe est incorrect");
     });
 
     it("/users/:id (PUT)", async () => {
@@ -247,4 +329,103 @@ describe('testing (e2e)', () => {
     });
   
   })
+
+  describe("ordersController", () => {
+    let orderId : string;
+    let uuid : string = uuidv4();
+    let productId : string = "6559d6c5118a401fc8456f28";
+    let userId : string = "64fb564f5b052ea8b128e96d";
+
+    it("/order (GET)", async () => {
+      const result = await request(app.getHttpServer())
+      .get("/order")
+      .set("Authorization",`Bearer ${token}`)
+
+      expect(result.status).toEqual(200);
+      expect(result.body).toBeInstanceOf(Array);
+    });
+
+    it("/order (POST)", async () => {  
+      const order = {
+        name:`e2e test - ${uuid}`,
+        authorId:userId,
+        productsId:[productId],
+        usersId:[userId],
+        address:{
+          street:"test",
+          city:"test",
+          zip:"59000",
+        }
+      }
+      const result = await request(app.getHttpServer())
+      .post("/order")
+      .set("Authorization",`Bearer ${token}`)
+      .send(order)
+      expect(result.status).toEqual(201);
+      expect(result.body).toHaveProperty("orderId")
+      expect(result.body).toHaveProperty("name",`e2e test - ${uuid}`)
+      orderId = result.body.orderId;
+    });
+
+    it("/order (POST) - throw error", async () => {  
+      const order = {
+        name:`e2e test - ${uuid}`,
+        authorId:userId,
+        productsId:[productId],
+        usersId:[userId],
+        address:{
+          street:"test",
+          city:"test",
+          zip:"59000",
+        }
+      }
+      const result = await request(app.getHttpServer())
+      .post("/order")
+      .set("Authorization",`Bearer ${token}`)
+      .send(order)
+      expect(result.status).toEqual(409);
+      expect(result.body.message).toEqual("order name already exist");
+    });
+
+    it("/order/:id (GET)", async () => {
+      const result = await request(app.getHttpServer())
+      .get(`/order/${orderId}`)
+      .set("Authorization",`Bearer ${token}`)
+      expect(result.status).toEqual(200);
+      expect(result.body).toHaveProperty("orderId");
+      expect(result.body).toHaveProperty("name",`e2e test - ${uuid}`)
+    });
+
+    it("/order/:id (GET) - throw error", async () => {
+      const idOrderFake = "123456789123456789123456"
+      const result = await request(app.getHttpServer())
+      .get(`/order/${idOrderFake}`)
+      .set("Authorization",`Bearer ${token}`)
+      expect(result.status).toEqual(404);
+      expect(result.body.message).toEqual(`OrderId : ${idOrderFake} not found`);
+    });
+
+    it("/order/:id (PUT)", async () => {
+      const order = {
+        name:"e2e test update",
+        productsId:[productId],
+        usersId:[userId]
+      }
+      const result = await request(app.getHttpServer())
+      .put(`/order/${orderId}`)
+      .set("Authorization",`Bearer ${token}`)
+      .send(order)
+      expect(result.status).toEqual(200);
+      expect(result.body).toHaveProperty("orderId");
+      expect(result.body).toHaveProperty("name","e2e test update")
+    });
+
+    it("/order/:id (DELETE)", async () => {
+      const result = await request(app.getHttpServer())
+      .delete(`/order/${orderId}`)
+      .set("Authorization",`Bearer ${token}`)
+      expect(result.status).toEqual(200);
+      expect(result.text).toEqual("Le devis à été supprimé")
+    });
+  });
 ;});
