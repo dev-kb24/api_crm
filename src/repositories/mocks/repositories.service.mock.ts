@@ -1,4 +1,5 @@
-import { expectedOrderEntityMock, orderEntityMock } from "@/order/mocks/entitiesMock/entities.mock";
+import {orderEntityMock } from "@/order/mocks/entitiesMock/entities.mock";
+import { productEntityMock } from "@/products/mocks/product.entity.mock";
 
 export class RepositoriesServiceMock{
     order = {
@@ -13,6 +14,11 @@ export class RepositoriesServiceMock{
     products = {
         findMany: jest.fn().mockResolvedValue([{productId:1,ordersId:["1234567891234567"]}]),
         updateMany: jest.fn().mockResolvedValue([{productId:1,ordersId:["1234567891234567"]}]),    
+        findFirst: jest.fn().mockResolvedValue(productEntityMock),
+        create: jest.fn().mockResolvedValue(productEntityMock),
+        findUnique: jest.fn().mockResolvedValue(productEntityMock),
+        delete: jest.fn().mockResolvedValue(productEntityMock),
+        update: jest.fn().mockResolvedValue(productEntityMock)
     }
 
     users = {

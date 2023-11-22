@@ -3,7 +3,7 @@
   "collectCoverage": true,
   "moduleFileExtensions": ["js", "json", "ts"],
   "testEnvironment": "node",
-  "testRegex": "/order/.*\\.spec\\.ts$",
+  "testRegex": ".*\\.spec\\.ts$",
   "preset": "ts-jest",
   "rootDir": "./src",
   "moduleNameMapper": {
