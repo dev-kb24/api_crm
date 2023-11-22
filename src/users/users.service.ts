@@ -7,10 +7,11 @@ import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntity } from './entity/userEntity';
+import { MailService } from '@/mailer/mail.service';
 
 @Injectable()
 export class UsersService {
-    constructor(private readonly repositoriesService: RepositoriesService, private configService : ConfigService, private jwtService : JwtService){}
+    constructor(private readonly repositoriesService: RepositoriesService, private configService : ConfigService, private jwtService : JwtService, private mailService: MailService){}
 
     private async hashPassword(password : string) : Promise<string> {
         try {
@@ -28,7 +29,9 @@ export class UsersService {
             throw new ConflictException('User already exist');
         }
         createUserDto.password = await this.hashPassword(password);
-        return await this.repositoriesService.users.create({data:createUserDto});
+        const user =  await this.repositoriesService.users.create({data:createUserDto});
+        await this.mailService.sendEmail(user.email,'user Created',"create_user");
+        return user;
     }
 
     async signin(createUserDto : CreateUserDto) : Promise<any>{
@@ -40,7 +43,8 @@ export class UsersService {
         if(!await bcrypt.compare(password,userExist.password)){
             throw new UnauthorizedException('Le mot de passe est incorrect');
         }
-        const payload = {sub:userExist.userId}
+        const payload = {sub:userExist.userId};
+
         return {
             user:userExist,
             access_token:await this.jwtService.signAsync(payload)

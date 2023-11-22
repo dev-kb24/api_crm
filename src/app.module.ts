@@ -12,7 +12,7 @@ import { SuppliersModule } from './suppliers/suppliers.module';
 import { OrderModule } from './order/order.module';
 
 @Module({
-  imports: [UsersModule, ProductsModule, RepositoriesModule, ConfigModule.forRoot({isGlobal:true}),JwtModule, SuppliersModule, OrderModule],
+  imports: [UsersModule, ProductsModule, RepositoriesModule, ConfigModule.forRoot({isGlobal:true}),JwtModule, SuppliersModule],
   controllers: [AppController, ProductsController],
   providers: [AppService, ProductsService],
 })
