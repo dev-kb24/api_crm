@@ -1,4 +1,4 @@
-import { expectedOrderEntityMock } from "./entitiesMock/entities.mock";
+import { expectedOrderEntityMock } from "./order.entity.mock";
 
 export class orderServiceMock{
     create = jest.fn().mockResolvedValue(expectedOrderEntityMock)

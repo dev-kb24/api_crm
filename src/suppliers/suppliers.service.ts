@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { RepositoriesService } from '@/repositories/repositories.service';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
-import { SuppliersEntity } from './entities/suppliersEntity';
+import { SuppliersEntity } from './entities/supplier.entity';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
 
 @Injectable()
@@ -38,7 +38,7 @@ export class SuppliersService {
       return await this.repositoriesService.suppliers.update({where:{suppliersId:supplierId},data:updateSupplierDto});
   }
 
- async remove(supplierId: string) : Promise<SuppliersEntity>
+ async delete(supplierId: string) : Promise<SuppliersEntity>
  {
       await this.findById(supplierId)
       return await this.repositoriesService.suppliers.delete({where:{suppliersId:supplierId}})

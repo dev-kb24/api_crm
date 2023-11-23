@@ -31,7 +31,7 @@ export class UsersService {
         createUserDto.password = await this.hashPassword(password);
         const user =  await this.repositoriesService.users.create({data:createUserDto});
         await this.mailService.sendEmail(user.email,'user Created',"create_user");
-        return user;
+        return user;  
     }
 
     async signin(createUserDto : CreateUserDto) : Promise<any>{

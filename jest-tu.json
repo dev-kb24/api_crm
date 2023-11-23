@@ -6,7 +6,16 @@
   "testRegex": ".*\\.spec\\.ts$",
   "preset": "ts-jest",
   "rootDir": "./src",
+  "coverageDirectory": "../coverage",
   "moduleNameMapper": {
     "^@/(.*)$": "<rootDir>/$1"
+  },
+  "coverageThreshold": {
+    "global": {
+      "branches": 80,
+      "functions": 80,
+      "lines": 80,
+      "statements": 80
+    }
   }
 }

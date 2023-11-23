@@ -29,7 +29,7 @@ export class SuppliersController {
   @UseInterceptors(ClassSerializerInterceptor) 
   @UseGuards(UsersGuard)  
   @Get(':id')
-  async findOne(@Param('id') supplierId: string) : Promise<OutputSupplierDto>
+  async findById(@Param('id') supplierId: string) : Promise<OutputSupplierDto>
   {
     return new OutputSupplierDto(await this.suppliersService.findById(supplierId));
   }
@@ -44,9 +44,9 @@ export class SuppliersController {
 
   @UseGuards(UsersGuard)
   @Delete(':id')
-  async remove(@Param('id') supplierId: string) : Promise<String>
+  async delete(@Param('id') supplierId: string) : Promise<String>
   {
-    await this.suppliersService.remove(supplierId);
+    await this.suppliersService.delete(supplierId);
     return  "le fournisseur a été supprimé";
   }
 }

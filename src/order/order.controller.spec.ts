@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { OrderController } from '@/order/order.controller';
 import { orderServiceMock } from '@/order/mocks/order.service.mock';
 import { OrderService } from '@/order/order.service';
-import { createOrderDtoMock, expectedOrderEntityMock } from './mocks/entitiesMock/entities.mock';
+import { createOrderDtoMock, expectedOrderEntityMock } from './mocks/order.entity.mock';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 describe('OrderController', () => {
