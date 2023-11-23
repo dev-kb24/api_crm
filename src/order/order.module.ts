@@ -6,6 +6,6 @@ import { JwtModule } from '@nestjs/jwt';
 @Module({
   controllers: [OrderController],
   providers: [OrderService],
-  imports:[JwtModule]
+  imports: [JwtModule],
 })
 export class OrderModule {}

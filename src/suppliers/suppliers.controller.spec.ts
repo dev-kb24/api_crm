@@ -4,7 +4,12 @@ import { SuppliersService } from './suppliers.service';
 import { SupplierServiceMock } from './mocks/supplier.service.mock';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { createSupplierDtoMock, expectedSupplierEntityMock, supplierEntityMock, updateSupplierDtoMock } from './mocks/supplier.entity.mock';
+import {
+  createSupplierDtoMock,
+  expectedSupplierEntityMock,
+  supplierEntityMock,
+  updateSupplierDtoMock,
+} from './mocks/supplier.entity.mock';
 
 describe('SuppliersController', () => {
   let controller: SuppliersController;
@@ -12,7 +17,11 @@ describe('SuppliersController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [SuppliersController],
-      providers: [JwtService,ConfigService,{provide:SuppliersService,useClass:SupplierServiceMock}],
+      providers: [
+        JwtService,
+        ConfigService,
+        { provide: SuppliersService, useClass: SupplierServiceMock },
+      ],
     }).compile();
 
     controller = module.get<SuppliersController>(SuppliersController);
@@ -37,7 +46,10 @@ describe('SuppliersController', () => {
   });
 
   it('should be update supplier', async () => {
-    const supplier = await controller.update(supplierEntityMock.suppliersId,updateSupplierDtoMock);
+    const supplier = await controller.update(
+      supplierEntityMock.suppliersId,
+      updateSupplierDtoMock,
+    );
     expect(supplier).toBeDefined();
     expect(supplier).toEqual(expectedSupplierEntityMock);
   });
@@ -45,6 +57,6 @@ describe('SuppliersController', () => {
   it('should be delete supplier', async () => {
     const supplier = await controller.delete(supplierEntityMock.suppliersId);
     expect(supplier).toBeDefined();
-    expect(supplier).toEqual("le fournisseur a été supprimé");
+    expect(supplier).toEqual('le fournisseur a été supprimé');
   });
 });

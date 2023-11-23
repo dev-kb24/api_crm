@@ -1,4 +1,4 @@
 export class SuppliersEntity {
-    readonly suppliersId: string
-    readonly raisonSocial: string
+  readonly suppliersId: string;
+  readonly raisonSocial: string;
 }
