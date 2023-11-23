@@ -3,7 +3,7 @@
   "collectCoverage": true,
   "moduleFileExtensions": ["js", "json", "ts"],
   "testEnvironment": "node",
-  "testRegex": "/test/.*\\.e2e-spec\\.ts$",
+  "testRegex": ".*\\.e2e-spec\\.ts$",
   "preset": "ts-jest",
   "rootDir": "./src",
   "moduleNameMapper": {

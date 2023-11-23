@@ -7,17 +7,17 @@ import { MailService } from '@/mailer/mail.service';
 
 @Module({
   imports: [
-    ConfigModule, 
+    ConfigModule,
     JwtModule.registerAsync({
-      imports: [ConfigModule], 
+      imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
         signOptions: { expiresIn: '3600s' },
       }),
-      inject: [ConfigService], 
+      inject: [ConfigService],
     }),
   ],
-  providers: [UsersService,MailService],
+  providers: [UsersService, MailService],
   controllers: [UsersController],
   exports: [UsersService],
 })

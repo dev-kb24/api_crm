@@ -2,7 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ProductsService } from './products.service';
 import { RepositoriesService } from '@/repositories/repositories.service';
 import { RepositoriesServiceMock } from '@/repositories/mocks/repositories.service.mock';
-import { productEntityMock,createProductDtoMock } from './mocks/product.entity.mock';
+import {
+  productEntityMock,
+  createProductDtoMock,
+} from './mocks/product.entity.mock';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 
 describe('ProductsService', () => {
@@ -10,21 +13,27 @@ describe('ProductsService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ProductsService,{provide:RepositoriesService,useClass:RepositoriesServiceMock}],
+      providers: [
+        ProductsService,
+        { provide: RepositoriesService, useClass: RepositoriesServiceMock },
+      ],
     }).compile();
 
     service = module.get<ProductsService>(ProductsService);
   });
 
   it('should be create product', async () => {
-    service['repositoriesService']['products']['findFirst'] = jest.fn().mockResolvedValue(undefined);
+    service['repositoriesService']['products']['findFirst'] = jest
+      .fn()
+      .mockResolvedValue(undefined);
     const result = await service.create(createProductDtoMock);
     expect(result).toEqual(productEntityMock);
   });
 
-
   it('should be get all products', async () => {
-    service['repositoriesService']['products']['findMany'] = jest.fn().mockResolvedValue([productEntityMock]);
+    service['repositoriesService']['products']['findMany'] = jest
+      .fn()
+      .mockResolvedValue([productEntityMock]);
     const result = await service.findAll();
     expect(result).toEqual([productEntityMock]);
   });
@@ -35,7 +44,10 @@ describe('ProductsService', () => {
   });
 
   it('should be update product', async () => {
-    const result = await service.update(createProductDtoMock.productId,createProductDtoMock);
+    const result = await service.update(
+      createProductDtoMock.productId,
+      createProductDtoMock,
+    );
     expect(result).toEqual(productEntityMock);
   });
 
@@ -44,26 +56,29 @@ describe('ProductsService', () => {
     expect(result).toEqual(productEntityMock);
   });
 
-  it("should be throw error if product exist", async () => {
+  it('should be throw error if product exist', async () => {
     try {
-      service['repositoriesService']['products']['findFirst'] = jest.fn().mockResolvedValue(productEntityMock);
+      service['repositoriesService']['products']['findFirst'] = jest
+        .fn()
+        .mockResolvedValue(productEntityMock);
       await service.create(createProductDtoMock);
     } catch (error) {
-      expect(error).toBeInstanceOf(ConflictException)
-      expect(error.message).toEqual("product already exist")
+      expect(error).toBeInstanceOf(ConflictException);
+      expect(error.message).toEqual('product already exist');
     }
-  })
+  });
 
-  it("should be throw error if findById return undefined", async () => {  
+  it('should be throw error if findById return undefined', async () => {
     try {
-      service['repositoriesService']['products']['findUnique'] = jest.fn().mockResolvedValue(undefined);
+      service['repositoriesService']['products']['findUnique'] = jest
+        .fn()
+        .mockResolvedValue(undefined);
       await service.findById(productEntityMock.productId);
     } catch (error) {
-      expect(error).toBeInstanceOf(NotFoundException)
-      expect(error.message).toEqual(`ProductId : ${productEntityMock.productId} not found`)
+      expect(error).toBeInstanceOf(NotFoundException);
+      expect(error.message).toEqual(
+        `ProductId : ${productEntityMock.productId} not found`,
+      );
     }
-  } )
-
-
-
+  });
 });

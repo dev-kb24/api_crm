@@ -3,6 +3,6 @@ import { RepositoriesService } from './repositories.service';
 @Global()
 @Module({
   providers: [RepositoriesService],
-  exports:[RepositoriesService]
+  exports: [RepositoriesService],
 })
 export class RepositoriesModule {}

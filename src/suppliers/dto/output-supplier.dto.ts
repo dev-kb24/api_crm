@@ -1,9 +1,8 @@
 export class OutputSupplierDto {
-    suppliersId: string
-    raisonSocial: string
+  suppliersId: string;
+  raisonSocial: string;
 
-    constructor(partial: Partial<OutputSupplierDto>) {
-       Object.assign(this, partial);
-   }
-
+  constructor(partial: Partial<OutputSupplierDto>) {
+    Object.assign(this, partial);
+  }
 }

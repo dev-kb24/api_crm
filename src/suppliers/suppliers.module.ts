@@ -4,8 +4,8 @@ import { SuppliersController } from './suppliers.controller';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports:[JwtModule],
+  imports: [JwtModule],
   controllers: [SuppliersController],
-  providers: [SuppliersService]
+  providers: [SuppliersService],
 })
 export class SuppliersModule {}

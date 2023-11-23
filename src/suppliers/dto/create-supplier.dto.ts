@@ -1,6 +1,6 @@
-import {IsString,IsOptional} from "class-validator"
+import { IsString, IsOptional } from 'class-validator';
 export class CreateSupplierDto {
-    @IsOptional()
-    @IsString()
-    readonly raisonSocial : string
+  @IsOptional()
+  @IsString()
+  readonly raisonSocial: string;
 }
