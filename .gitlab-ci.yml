@@ -22,3 +22,8 @@ install:
   script:
     - npm install
 
+test:
+  script:
+    - npm run test
+    - npm run lint
+
