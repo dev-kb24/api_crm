@@ -37,23 +37,38 @@ describe('UsersGuard', () => {
     const context = {
       switchToHttp: () => ({ getRequest: () => ({ headers: {} }) }),
     } as any;
-    
-    await expect(guard.canActivate(context)).rejects.toThrow(UnauthorizedException);
+
+    await expect(guard.canActivate(context)).rejects.toThrow(
+      UnauthorizedException,
+    );
   });
 
   it('should throw UnauthorizedException if token is invalid', async () => {
     const context = {
-      switchToHttp: () => ({ getRequest: () => ({ headers: { authorization: 'Bearer invalid-token' } }) }),
+      switchToHttp: () => ({
+        getRequest: () => ({
+          headers: { authorization: 'Bearer invalid-token' },
+        }),
+      }),
     } as any;
 
-    (guard as any).jwtService.verifyAsync.mockRejectedValueOnce(new Error('Invalid token'));
+    (guard as any).jwtService.verifyAsync.mockRejectedValueOnce(
+      new Error('Invalid token'),
+    );
 
-    await expect(guard.canActivate(context)).rejects.toThrow(UnauthorizedException);
+    await expect(guard.canActivate(context)).rejects.toThrow(
+      UnauthorizedException,
+    );
   });
 
   it('should set user in request if token is valid', async () => {
-    let context = {
-      switchToHttp: () => ({ getRequest: () => ({ headers: { authorization: 'Bearer valid-token' },user:{}}) }),
+    const context = {
+      switchToHttp: () => ({
+        getRequest: () => ({
+          headers: { authorization: 'Bearer valid-token' },
+          user: {},
+        }),
+      }),
     } as any;
 
     const mockPayload = { userId: 1 };

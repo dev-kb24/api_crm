@@ -47,6 +47,6 @@ export class RepositoriesServiceMock {
     create: jest.fn().mockResolvedValue(userEntityMock),
     findUnique: jest.fn().mockResolvedValue(userEntityMock),
     delete: jest.fn().mockResolvedValue(userEntityMock),
-    update: jest.fn().mockResolvedValue(userEntityMock)
+    update: jest.fn().mockResolvedValue(userEntityMock),
   };
 }

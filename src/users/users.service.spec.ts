@@ -6,8 +6,17 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { MailService } from '@/mailer/mail.service';
 import { MailServiceMock } from '@/mailer/mocks/mail.service.mock';
-import { createUserDtoMock, updateUserDtoMock, updateUserPasswordDtoMock, userEntityMock } from './mocks/users.entity.mock';
-import { ConflictException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  createUserDtoMock,
+  updateUserDtoMock,
+  updateUserPasswordDtoMock,
+  userEntityMock,
+} from './mocks/users.entity.mock';
+import {
+  ConflictException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { jwtServiceMock } from './mocks/jwt.service.mock';
 
@@ -16,7 +25,13 @@ describe('UsersService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [UsersService,{provide:MailService,useClass:MailServiceMock},{provide:JwtService,useClass:jwtServiceMock},ConfigService,{ provide: RepositoriesService, useClass: RepositoriesServiceMock }],
+      providers: [
+        UsersService,
+        { provide: MailService, useClass: MailServiceMock },
+        { provide: JwtService, useClass: jwtServiceMock },
+        ConfigService,
+        { provide: RepositoriesService, useClass: RepositoriesServiceMock },
+      ],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
@@ -40,7 +55,7 @@ describe('UsersService', () => {
     jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as never);
     const user = await service.signin(createUserDtoMock);
     expect(user).toBeDefined();
-    expect(user).toEqual({access_token: 'token',user:userEntityMock});
+    expect(user).toEqual({ access_token: 'token', user: userEntityMock });
   });
 
   it('should be throw error if user exist', async () => {
@@ -97,7 +112,10 @@ describe('UsersService', () => {
         .fn()
         .mockResolvedValue(userEntityMock);
       jest.spyOn(bcrypt, 'compare').mockResolvedValue(false as never);
-      await service.updatePassword(updateUserPasswordDtoMock,userEntityMock.userId);
+      await service.updatePassword(
+        updateUserPasswordDtoMock,
+        userEntityMock.userId,
+      );
     } catch (error) {
       expect(error).toBeInstanceOf(ConflictException);
       expect(error.message).toEqual('Le mot de passe est incorrect');
@@ -111,16 +129,16 @@ describe('UsersService', () => {
     jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as never);
     jest.spyOn(bcrypt, 'genSalt').mockResolvedValue('salt' as never);
     jest.spyOn(bcrypt, 'hash').mockResolvedValue('password' as never);
-    const user = await service.updatePassword({oldPassword:'password',newPassword:'password2'},userEntityMock.userId);
+    const user = await service.updatePassword(
+      { oldPassword: 'password', newPassword: 'password2' },
+      userEntityMock.userId,
+    );
     expect(user).toBeDefined();
     expect(user).toEqual(userEntityMock);
   });
 
   it('should be update user', async () => {
-    const user = await service.update(
-      updateUserDtoMock,
-      userEntityMock.userId
-    );
+    const user = await service.update(updateUserDtoMock, userEntityMock.userId);
     expect(user).toEqual(userEntityMock);
   });
 
@@ -147,6 +165,4 @@ describe('UsersService', () => {
     const user = await service.delete(userEntityMock.userId);
     expect(user).toEqual(userEntityMock);
   });
-
-  
 });

@@ -1,4 +1,4 @@
-import { expectedUserEntityMock } from "./users.entity.mock";
+import { expectedUserEntityMock } from './users.entity.mock';
 
 export class UsersServiceMock {
   signup = jest.fn().mockResolvedValue(expectedUserEntityMock);

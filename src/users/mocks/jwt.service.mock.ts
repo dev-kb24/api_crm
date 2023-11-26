@@ -1,3 +1,3 @@
 export class jwtServiceMock {
-    signAsync = jest.fn().mockResolvedValue('token');
+  signAsync = jest.fn().mockResolvedValue('token');
 }

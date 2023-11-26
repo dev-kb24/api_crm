@@ -4,7 +4,13 @@ import { UsersService } from './users.service';
 import { UsersServiceMock } from './mocks/users.service.mock';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { createUserDtoMock, expectedUserEntityMock, updateUserDtoMock, updateUserPasswordDtoMock, userEntityMock } from './mocks/users.entity.mock';
+import {
+  createUserDtoMock,
+  expectedUserEntityMock,
+  updateUserDtoMock,
+  updateUserPasswordDtoMock,
+  userEntityMock,
+} from './mocks/users.entity.mock';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -12,7 +18,11 @@ describe('UsersController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
-      providers:[JwtService,ConfigService,{ provide: UsersService, useClass: UsersServiceMock }]
+      providers: [
+        JwtService,
+        ConfigService,
+        { provide: UsersService, useClass: UsersServiceMock },
+      ],
     }).compile();
 
     controller = module.get<UsersController>(UsersController);
@@ -24,7 +34,7 @@ describe('UsersController', () => {
     expect(user).toEqual(expectedUserEntityMock);
   });
 
- it('should be signin user', async () => {
+  it('should be signin user', async () => {
     const user = await controller.signin(createUserDtoMock);
     expect(user).toBeDefined();
     expect(user).toEqual(expectedUserEntityMock);
@@ -37,13 +47,19 @@ describe('UsersController', () => {
   });
 
   it('should be update user', async () => {
-    const user = await controller.update(updateUserDtoMock,userEntityMock.userId);
+    const user = await controller.update(
+      updateUserDtoMock,
+      userEntityMock.userId,
+    );
     expect(user).toBeDefined();
     expect(user).toEqual(expectedUserEntityMock);
   });
 
   it('should be update password user', async () => {
-    const user = await controller.updatePassword(updateUserPasswordDtoMock,userEntityMock.userId);
+    const user = await controller.updatePassword(
+      updateUserPasswordDtoMock,
+      userEntityMock.userId,
+    );
     expect(user).toBeDefined();
     expect(user).toEqual('Le mot de passe a été modifié');
   });
@@ -51,13 +67,11 @@ describe('UsersController', () => {
   it('should be delete user', async () => {
     const user = await controller.delete(userEntityMock.userId);
     expect(user).toBeDefined();
-    expect(user).toEqual('L\'utilisateur a été supprimé');
+    expect(user).toEqual("L'utilisateur a été supprimé");
   });
 
   it('should be can access to the route', () => {
     const result = controller.access();
-    expect(result).toEqual("Vous etes Autorisé !");
+    expect(result).toEqual('Vous etes Autorisé !');
   });
-
-
 });
