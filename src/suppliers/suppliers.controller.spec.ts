@@ -28,7 +28,7 @@ describe('SuppliersController', () => {
   });
 
   it('should be create supplier', async () => {
-    const supplier = await controller.create(supplierEntityMock);
+    const supplier = await controller.create(createSupplierDtoMock);
     expect(supplier).toBeDefined();
     expect(supplier).toEqual(expectedSupplierEntityMock);
   });

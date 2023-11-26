@@ -5,7 +5,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { RepositoriesService } from '@/repositories/repositories.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { SignupUserDto } from './dto/signup-user.dto';
+import { SigninUserDto } from './dto/signin-user.dto';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config/dist';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
@@ -36,24 +37,24 @@ export class UsersService {
     }
   }
 
-  async signup(createUserDto: CreateUserDto): Promise<UserEntity> {
-    const { email, password } = createUserDto;
+  async signup(signupUserDto: SignupUserDto): Promise<UserEntity> {
+    const { email, password } = signupUserDto;
     const userExist = await this.repositoriesService.users.findFirst({
       where: { email: email },
     });
     if (userExist) {
       throw new ConflictException('User already exist');
     }
-    createUserDto.password = await this.hashPassword(password);
+    signupUserDto.password = await this.hashPassword(password);
     const user = await this.repositoriesService.users.create({
-      data: createUserDto,
+      data: signupUserDto,
     });
     await this.mailService.sendEmail(user.email, 'user Created', 'create_user');
     return user;
   }
 
-  async signin(createUserDto: CreateUserDto): Promise<any> {
-    const { email, password } = createUserDto;
+  async signin(signinUserDto: SigninUserDto): Promise<any> {
+    const { email, password } = signinUserDto;
     const userExist = await this.repositoriesService.users.findFirst({
       where: { email: email },
     });

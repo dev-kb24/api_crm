@@ -5,7 +5,8 @@ import { UsersServiceMock } from './mocks/users.service.mock';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import {
-  createUserDtoMock,
+  signupUserDtoMock,
+  signinUserDtoMock,
   expectedUserEntityMock,
   updateUserDtoMock,
   updateUserPasswordDtoMock,
@@ -29,13 +30,13 @@ describe('UsersController', () => {
   });
 
   it('should be create user', async () => {
-    const user = await controller.signup(createUserDtoMock);
+    const user = await controller.signup(signupUserDtoMock);
     expect(user).toBeDefined();
     expect(user).toEqual(expectedUserEntityMock);
   });
 
   it('should be signin user', async () => {
-    const user = await controller.signin(createUserDtoMock);
+    const user = await controller.signin(signinUserDtoMock);
     expect(user).toBeDefined();
     expect(user).toEqual(expectedUserEntityMock);
   });

@@ -7,7 +7,8 @@ import { JwtService } from '@nestjs/jwt';
 import { MailService } from '@/mailer/mail.service';
 import { MailServiceMock } from '@/mailer/mocks/mail.service.mock';
 import {
-  createUserDtoMock,
+  signupUserDtoMock,
+  signinUserDtoMock,
   updateUserDtoMock,
   updateUserPasswordDtoMock,
   userEntityMock,
@@ -43,7 +44,7 @@ describe('UsersService', () => {
       .mockResolvedValue(undefined);
     jest.spyOn(bcrypt, 'genSalt').mockResolvedValue('salt' as never);
     jest.spyOn(bcrypt, 'hash').mockResolvedValue('password' as never);
-    const user = await service.signup(createUserDtoMock);
+    const user = await service.signup(signupUserDtoMock);
     expect(user).toBeDefined();
     expect(user).toEqual(userEntityMock);
   });
@@ -53,14 +54,14 @@ describe('UsersService', () => {
       .fn()
       .mockResolvedValue(userEntityMock);
     jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as never);
-    const user = await service.signin(createUserDtoMock);
+    const user = await service.signin(signinUserDtoMock);
     expect(user).toBeDefined();
     expect(user).toEqual({ access_token: 'token', user: userEntityMock });
   });
 
   it('should be throw error if user exist', async () => {
     try {
-      await service.signup(createUserDtoMock);
+      await service.signup(signupUserDtoMock);
     } catch (error) {
       expect(error).toBeInstanceOf(ConflictException);
       expect(error.message).toEqual('User already exist');
@@ -72,7 +73,7 @@ describe('UsersService', () => {
       service['repositoriesService']['users']['findFirst'] = jest
         .fn()
         .mockResolvedValue(undefined);
-      await service.signin(createUserDtoMock);
+      await service.signin(signinUserDtoMock);
     } catch (error) {
       expect(error).toBeInstanceOf(NotFoundException);
       expect(error.message).toEqual('User not found');
@@ -85,7 +86,7 @@ describe('UsersService', () => {
         .fn()
         .mockResolvedValue(userEntityMock);
       jest.spyOn(bcrypt, 'compare').mockResolvedValue(false as never);
-      await service.signin(createUserDtoMock);
+      await service.signin(signinUserDtoMock);
     } catch (error) {
       expect(error).toBeInstanceOf(UnauthorizedException);
       expect(error.message).toEqual('Le mot de passe est incorrect');
@@ -99,7 +100,7 @@ describe('UsersService', () => {
         .mockResolvedValue(undefined);
       jest.spyOn(bcrypt, 'genSalt').mockResolvedValue('salt' as never);
       jest.spyOn(bcrypt, 'hash').mockRejectedValue('error' as never);
-      await service.signup(createUserDtoMock);
+      await service.signup(signupUserDtoMock);
     } catch (error) {
       expect(error).toBeInstanceOf(ConflictException);
       expect(error.message).toEqual('Erreur lors du hashage du password error');
