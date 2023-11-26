@@ -14,8 +14,14 @@ import { SuppliersService } from './suppliers.service';
 import { UsersGuard } from '@/users/users.guard';
 import { OutputSupplierDto } from './dto/output-supplier.dto';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
-import { UpdateSupplierDto } from './dto/update-supplier.dto';
+import {
+  ApiBody,
+  ApiNoContentResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
+@ApiTags('suppliers')
 @Controller('suppliers')
 export class SuppliersController {
   constructor(private readonly suppliersService: SuppliersService) {}
@@ -23,6 +29,8 @@ export class SuppliersController {
   @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(UsersGuard)
   @Post()
+  @ApiOkResponse({ description: 'Opération réussie', type: OutputSupplierDto })
+  @ApiBody({ type: CreateSupplierDto })
   async create(
     @Body() createSupplierDto: CreateSupplierDto,
   ): Promise<OutputSupplierDto> {
@@ -34,6 +42,10 @@ export class SuppliersController {
   @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(UsersGuard)
   @Get()
+  @ApiOkResponse({
+    description: 'Opération réussie',
+    type: [OutputSupplierDto],
+  })
   async findAll(): Promise<OutputSupplierDto[]> {
     const suppliers = await this.suppliersService.findAll();
     return suppliers.map((supplier) => new OutputSupplierDto(supplier));
@@ -42,6 +54,7 @@ export class SuppliersController {
   @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(UsersGuard)
   @Get(':id')
+  @ApiOkResponse({ description: 'Opération réussie', type: OutputSupplierDto })
   async findById(@Param('id') supplierId: string): Promise<OutputSupplierDto> {
     return new OutputSupplierDto(
       await this.suppliersService.findById(supplierId),
@@ -51,6 +64,8 @@ export class SuppliersController {
   @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(UsersGuard)
   @Put(':id')
+  @ApiOkResponse({ description: 'Opération réussie', type: OutputSupplierDto })
+  @ApiBody({ type: CreateSupplierDto })
   async update(
     @Param('id') supplierId: string,
     @Body() createSupplierDto: CreateSupplierDto,
@@ -62,6 +77,7 @@ export class SuppliersController {
 
   @UseGuards(UsersGuard)
   @Delete(':id')
+  @ApiNoContentResponse({ description: 'le fournisseur a été supprimé' })
   async delete(@Param('id') supplierId: string): Promise<string> {
     await this.suppliersService.delete(supplierId);
     return 'le fournisseur a été supprimé';

@@ -1,4 +1,5 @@
-import { CreateUserDto } from '../dto/create-user.dto';
+import { SigninUserDto } from '../dto/signin-user.dto';
+import { SignupUserDto } from '../dto/signup-user.dto';
 import { UpdateUserPasswordDto } from '../dto/update-user-password.dto';
 import { UserEntity } from '../entity/userEntity';
 
@@ -17,14 +18,19 @@ export const expectedUserEntityMock: any = {
   lastname: 'lastname',
 };
 
-export const createUserDtoMock: CreateUserDto = {
+export const signupUserDtoMock: SignupUserDto = {
   email: 'test@test.fr',
   password: 'password',
   firstname: 'firstname',
   lastname: 'lastname',
 };
 
-export const updateUserDtoMock: CreateUserDto = {
+export const signinUserDtoMock: SigninUserDto = {
+  email: 'test@test.fr',
+  password: 'password',
+};
+
+export const updateUserDtoMock: SignupUserDto = {
   email: 'test@test.fr',
   password: 'password',
   firstname: 'firstname',

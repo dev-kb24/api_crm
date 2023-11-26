@@ -55,6 +55,7 @@ export const orderEntityMock: OrderEntity = {
 };
 
 export const expectedOrderEntityMock: any = {
+  orderId: '1234567891234567',
   name: 'order name',
   comment: 'order description',
   created_at: new Date(),
