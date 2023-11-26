@@ -76,11 +76,12 @@ export class UsersService {
     userId: string,
   ): Promise<UserEntity> {
     const userExist = await this.findById(userId);
-    const password = await bcrypt.compare(
-      updateUserPasswordDto.oldPassword,
-      userExist.password,
-    );
-    if (!password) {
+    if (
+      !(await bcrypt.compare(
+        updateUserPasswordDto.oldPassword,
+        userExist.password,
+      ))
+    ) {
       throw new ConflictException('Le mot de passe est incorrect');
     }
     const newPassword = await this.hashPassword(
