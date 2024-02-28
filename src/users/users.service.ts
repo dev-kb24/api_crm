@@ -11,8 +11,8 @@ import { ConfigService } from '@nestjs/config/dist';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtService } from '@nestjs/jwt';
-import { UserEntity } from './entity/userEntity';
 import { MailService } from '@/mailer/mail.service';
+import { Users } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -36,7 +36,7 @@ export class UsersService {
     }
   }
 
-  async signup(createUserDto: CreateUserDto): Promise<UserEntity> {
+  async signup(createUserDto: CreateUserDto): Promise<Users> {
     const { email, password } = createUserDto;
     const userExist = await this.repositoriesService.users.findFirst({
       where: { email: email },
@@ -46,7 +46,13 @@ export class UsersService {
     }
     createUserDto.password = await this.hashPassword(password);
     const user = await this.repositoriesService.users.create({
-      data: createUserDto,
+      data: {
+        ...createUserDto,
+        order: {
+          connect: createUserDto.ordersId.map((orderId) => ({ orderId })),
+        },
+      },
+      include: { order: true },
     });
     await this.mailService.sendEmail(user.email, 'user Created', 'create_user');
     return user;
@@ -66,7 +72,6 @@ export class UsersService {
     const payload = { sub: userExist.userId };
 
     return {
-      user: userExist,
       access_token: await this.jwtService.signAsync(payload),
     };
   }
@@ -74,7 +79,7 @@ export class UsersService {
   async updatePassword(
     updateUserPasswordDto: UpdateUserPasswordDto,
     userId: string,
-  ): Promise<UserEntity> {
+  ): Promise<Users> {
     const userExist = await this.findById(userId);
     if (
       !(await bcrypt.compare(
@@ -90,34 +95,35 @@ export class UsersService {
     return await this.repositoriesService.users.update({
       where: { userId: userId },
       data: { password: newPassword },
+      include: { order: true },
     });
   }
 
-  async update(
-    updateUserDto: UpdateUserDto,
-    userId: string,
-  ): Promise<UserEntity> {
+  async update(updateUserDto: UpdateUserDto, userId: string): Promise<Users> {
     await this.findById(userId);
     return await this.repositoriesService.users.update({
       where: { userId: userId },
       data: updateUserDto,
+      include: { order: true },
     });
   }
 
-  async getProfil(userId: string): Promise<UserEntity> {
+  async getProfil(userId: string): Promise<Users> {
     return await this.findById(userId);
   }
 
-  async delete(userId: string): Promise<UserEntity> {
+  async delete(userId: string): Promise<Users> {
     await this.findById(userId);
     return await this.repositoriesService.users.delete({
       where: { userId: userId },
+      include: { order: true },
     });
   }
 
-  async findById(userId: string): Promise<UserEntity> {
+  async findById(userId: string): Promise<Users> {
     const user = await this.repositoriesService.users.findUnique({
       where: { userId: userId },
+      include: { order: true },
     });
     if (!user) {
       throw new NotFoundException(`UserId : ${userId} not found`);

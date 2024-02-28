@@ -3,11 +3,13 @@ import {
   IsString,
   IsOptional,
   IsDateString,
-  IsObject,
   IsArray,
+  ValidateNested,
 } from 'class-validator';
-import { AddressEntity } from '@/order/entities/address.entity';
-import { PicturesEntity } from '@/order/entities/pictures.entity';
+import { AddressType } from '@/utils/types/address.type';
+import { Address, Pictures } from '@prisma/client';
+import { Type } from 'class-transformer';
+import { PicturesType } from '@/utils/types/pictures.type';
 export class CreateOrderDto {
   @IsString()
   @IsNotEmpty()
@@ -17,9 +19,9 @@ export class CreateOrderDto {
   @IsOptional()
   readonly comment: string;
 
-  @IsObject()
-  @IsNotEmpty()
-  readonly address: AddressEntity;
+  @ValidateNested()
+  @Type(() => AddressType)
+  readonly address: Address;
 
   @IsDateString()
   @IsOptional()
@@ -41,11 +43,11 @@ export class CreateOrderDto {
   @IsNotEmpty()
   readonly productsId: string[];
 
-  @IsObject()
-  @IsOptional()
-  readonly picture_before: PicturesEntity;
+  @ValidateNested({ each: true })
+  @Type(() => PicturesType)
+  readonly picture_before: Pictures[];
 
-  @IsObject()
-  @IsOptional()
-  readonly picture_after: PicturesEntity;
+  @ValidateNested({ each: true })
+  @Type(() => PicturesType)
+  readonly picture_after: Pictures[];
 }

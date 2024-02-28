@@ -14,7 +14,6 @@ import { SuppliersService } from './suppliers.service';
 import { UsersGuard } from '@/users/users.guard';
 import { OutputSupplierDto } from './dto/output-supplier.dto';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
-import { UpdateSupplierDto } from './dto/update-supplier.dto';
 
 @Controller('suppliers')
 export class SuppliersController {

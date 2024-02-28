@@ -33,7 +33,7 @@ model Products {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   reference References?
-  pictures Pictures[]
+  product_picture Pictures[]
   weight Float?
   height Float?
   width Float?
@@ -73,7 +73,7 @@ model Order {
 }
 
 type Address {
-  name_address String
+  name_address String 
   street String
   city String
   zip String
@@ -113,7 +113,7 @@ type Coordonnees {
 }
 
 type Supplier_contact {
-  principal_contact Int
+  principal_contact Boolean
   firstname String
   lastname String
   email String

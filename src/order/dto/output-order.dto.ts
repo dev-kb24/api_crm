@@ -1,7 +1,7 @@
-import { ProductEntity } from '@/products/entities/productEntity';
-import { AddressEntity } from '@/order/entities/address.entity';
-import { PicturesEntity } from '@/order/entities/pictures.entity';
-import { Exclude } from 'class-transformer';
+import { OutputProductDto } from '@/products/dto/output-product.dto';
+import { OutputUserDto } from '@/users/dto/output-user.dto';
+import { Address, Pictures, Products, Users } from '@prisma/client';
+import { Exclude, Transform } from 'class-transformer';
 
 export class OutputOrderDto {
   readonly name: string;
@@ -11,15 +11,24 @@ export class OutputOrderDto {
   readonly started_at: Date;
   readonly finished_at: Date;
   readonly authorId: string;
+
   @Exclude()
   readonly usersId: Array<string>;
+
   @Exclude()
   readonly productsId: Array<string>;
-  readonly users: Array<any>;
-  readonly products: Array<ProductEntity>;
-  readonly address: AddressEntity;
-  readonly picture_before: PicturesEntity | any;
-  readonly picture_after: PicturesEntity | any;
+
+  @Transform(({ value }) => value.map((user: Users) => new OutputUserDto(user)))
+  readonly users: Array<Users>;
+
+  @Transform(({ value }) =>
+    value.map((product: Products) => new OutputProductDto(product)),
+  )
+  readonly products: Array<Products>;
+
+  readonly address: Address;
+  readonly picture_before: Pictures[];
+  readonly picture_after: Pictures[];
 
   constructor(partial: Partial<OutputOrderDto>) {
     Object.assign(this, partial);

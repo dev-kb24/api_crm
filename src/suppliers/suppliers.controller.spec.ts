@@ -5,7 +5,6 @@ import { SupplierServiceMock } from './mocks/supplier.service.mock';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import {
-  createSupplierDtoMock,
   expectedSupplierEntityMock,
   supplierEntityMock,
   updateSupplierDtoMock,
