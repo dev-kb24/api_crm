@@ -1,9 +1,16 @@
-import { IsNotEmpty, IsString, IsOptional, IsEmail, IsNumber, ValidateNested, IsArray } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsEmail,
+  IsNumber,
+  ValidateNested,
+  IsArray,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { PicturesType } from '@/utils/types/pictures.type';
 export class SignupUserDto {
-
   @ApiProperty()
   @IsNotEmpty()
   @IsEmail()
@@ -38,7 +45,7 @@ export class SignupUserDto {
   @ValidateNested()
   @Type(() => PicturesType)
   readonly avatar: PicturesType;
-  
+
   @ApiPropertyOptional()
   @IsArray()
   readonly ordersId: Array<string>;

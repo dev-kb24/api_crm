@@ -46,7 +46,9 @@ export class UsersService {
       throw new ConflictException('User already exist');
     }
     signupUserDto.password = await this.hashPassword(password);
-    const user = await this.repositoriesService.users.create({data: signupUserDto});
+    const user = await this.repositoriesService.users.create({
+      data: signupUserDto,
+    });
     await this.mailService.sendEmail(user.email, 'user Created', 'create_user');
     return user;
   }
