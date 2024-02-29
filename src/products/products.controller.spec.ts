@@ -5,6 +5,7 @@ import { ProductServiceMock } from './mocks/product.service.mock';
 import {
   createProductDtoMock,
   expectedProductEntityMock,
+  productEntityMock,
 } from './mocks/product.entity.mock';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -38,26 +39,22 @@ describe('ProductsController', () => {
   });
 
   it('should be get one product', async () => {
-    const product = await controller.findById(
-      expectedProductEntityMock.productId,
-    );
+    const product = await controller.findById(productEntityMock.productId);
     expect(product).toBeDefined();
     expect(product).toEqual(expectedProductEntityMock);
   });
 
   it('should be update product', async () => {
     const product = await controller.update(
-      expectedProductEntityMock.productId,
       createProductDtoMock,
+      productEntityMock.productId,
     );
     expect(product).toBeDefined();
     expect(product).toEqual(expectedProductEntityMock);
   });
 
   it('should be delete product', async () => {
-    const product = await controller.delete(
-      expectedProductEntityMock.productId,
-    );
+    const product = await controller.delete(productEntityMock.productId);
     expect(product).toBeDefined();
     expect(product).toEqual('Le produit à été supprimé');
   });

@@ -1,5 +1,6 @@
 {
   "verbose": true,
+  "coverageReporters": ["json", "lcov", "text", "clover"],
   "collectCoverage": true,
   "moduleFileExtensions": ["js", "json", "ts"],
   "testEnvironment": "node",
@@ -10,6 +11,23 @@
   "moduleNameMapper": {
     "^@/(.*)$": "<rootDir>/$1"
   },
+  "collectCoverageFrom":[
+    "mailer/**/*.ts",
+    "order/**/*.ts",
+    "products/**/*.ts",
+    "suppliers/**/*.ts",
+    "users/**/*.ts",
+    "utils/**/*.ts",
+    "!**/utils/types/**",
+    "!**/**/dto/**",
+    "!**/**/mocks/**",
+    "!**/*.module.ts"
+  ],
+  "testPathIgnorePatterns": [
+    "/node_modules/",
+    "/dist/",
+    "/coverage/"
+  ],
   "coverageThreshold": {
     "global": {
       "branches": 80,

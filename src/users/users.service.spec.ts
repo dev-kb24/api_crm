@@ -56,7 +56,7 @@ describe('UsersService', () => {
     jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as never);
     const user = await service.signin(signinUserDtoMock);
     expect(user).toBeDefined();
-    expect(user).toEqual({ access_token: 'token', user: userEntityMock });
+    expect(user).toEqual({ access_token: 'token' });
   });
 
   it('should be throw error if user exist', async () => {

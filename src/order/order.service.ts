@@ -7,13 +7,13 @@ import {
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { RepositoriesService } from '@/repositories/repositories.service';
-import { OrderEntity } from '@/order/entities/order.entity';
+import { Order } from '@prisma/client';
 
 @Injectable()
 export class OrderService {
   constructor(private readonly repositoriesService: RepositoriesService) {}
 
-  async create(createOrderDto: CreateOrderDto): Promise<OrderEntity> {
+  async create(createOrderDto: CreateOrderDto): Promise<Order> {
     const { name } = createOrderDto;
 
     await this.searchName(name);
@@ -38,13 +38,13 @@ export class OrderService {
     }
   }
 
-  async findAll(): Promise<OrderEntity[]> {
+  async findAll(): Promise<Order[]> {
     return await this.repositoriesService.order.findMany({
       include: { products: true, users: true },
     });
   }
 
-  async findById(orderId: string) {
+  async findById(orderId: string): Promise<Order> {
     const order = await this.repositoriesService.order.findUnique({
       where: { orderId: orderId },
       include: { users: true, products: true },
@@ -55,18 +55,12 @@ export class OrderService {
     return order;
   }
 
-  async update(orderId: string, updateOrderDto: UpdateOrderDto) {
-    const order = await this.findById(orderId);
-
-    const userIdDisconnect = order.users
-      .map((user) => user.userId)
-      .filter((userId) => !updateOrderDto.usersId.includes(userId));
-    const productIdDisconnect = order.products
-      .map((product) => product.productId)
-      .filter((productId) => !updateOrderDto.productsId.includes(productId));
-
+  async update(
+    orderId: string,
+    updateOrderDto: UpdateOrderDto,
+  ): Promise<Order> {
     try {
-      const orderUpdated = await this.repositoriesService.order.update({
+      return await this.repositoriesService.order.update({
         where: { orderId: orderId },
         data: {
           ...updateOrderDto,
@@ -79,64 +73,20 @@ export class OrderService {
         },
         include: { products: true, users: true },
       });
-
-      await this.updateUser(userIdDisconnect, orderId);
-
-      await this.updateProduct(productIdDisconnect, orderId);
-
-      return orderUpdated;
     } catch (error) {
       throw new BadRequestException(error);
     }
   }
 
-  async delete(orderId: string): Promise<OrderEntity> {
-    const order = await this.findById(orderId);
+  async delete(orderId: string): Promise<Order> {
     try {
-      const orderDeleted = await this.repositoriesService.order.delete({
+      return await this.repositoriesService.order.delete({
         where: { orderId: orderId },
         include: { products: true, users: true },
       });
-      await this.updateProduct(orderDeleted.productsId, orderId);
-      await this.updateUser(orderDeleted.usersId, orderId);
-      return order;
     } catch (error) {
       throw new BadRequestException(error);
     }
-  }
-
-  private async updateProduct(
-    productIdDisconnect: Array<string>,
-    orderId: string,
-  ): Promise<void> {
-    const products = await this.repositoriesService.products.findMany({
-      where: { productId: { in: productIdDisconnect } },
-    });
-    const productsIds = products.map((product) => product.productId);
-    const ordersIds = products.map((product) =>
-      product.ordersId.filter((id) => id !== orderId),
-    );
-    await this.repositoriesService.products.updateMany({
-      where: { productId: { in: productsIds } },
-      data: { ordersId: { set: ordersIds.flat() } },
-    });
-  }
-
-  private async updateUser(
-    userIdDisconnect: Array<string>,
-    orderId: string,
-  ): Promise<void> {
-    const users = await this.repositoriesService.users.findMany({
-      where: { userId: { in: userIdDisconnect } },
-    });
-    const userIds = users.map((user) => user.userId);
-    const ordersIds = users.map((user) =>
-      user.ordersId.filter((id) => id !== orderId),
-    );
-    await this.repositoriesService.users.updateMany({
-      where: { userId: { in: userIds } },
-      data: { ordersId: { set: ordersIds.flat() } },
-    });
   }
 
   private async searchName(name: string): Promise<void> {

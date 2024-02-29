@@ -45,8 +45,8 @@ describe('ProductsService', () => {
 
   it('should be update product', async () => {
     const result = await service.update(
-      createProductDtoMock.productId,
       createProductDtoMock,
+      productEntityMock.productId,
     );
     expect(result).toEqual(productEntityMock);
   });

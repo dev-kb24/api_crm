@@ -5,15 +5,15 @@ import {
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { RepositoriesService } from '@/repositories/repositories.service';
-import { ProductEntity } from './entities/productEntity';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { Products } from '@prisma/client';
 
 @Injectable()
 export class ProductsService {
   constructor(private readonly repositoriesService: RepositoriesService) {}
 
-  async create(inputProduct: CreateProductDto): Promise<ProductEntity> {
-    const { name } = inputProduct;
+  async create(createProductDto: CreateProductDto): Promise<Products> {
+    const { name } = createProductDto;
     const productExist = await this.repositoriesService.products.findFirst({
       where: { name: name },
     });
@@ -21,29 +21,37 @@ export class ProductsService {
       throw new ConflictException('product already exist');
     }
     return await this.repositoriesService.products.create({
-      data: inputProduct,
+      data: {
+        ...createProductDto,
+        order: {
+          connect: createProductDto.ordersId.map((orderId) => ({ orderId })),
+        },
+      },
+      include: { order: true },
     });
   }
 
   async update(
-    inputProduct: UpdateProductDto,
+    updateProductDto: UpdateProductDto,
     productId: string,
-  ): Promise<ProductEntity> {
+  ): Promise<Products> {
     await this.findById(productId);
     return await this.repositoriesService.products.update({
       where: { productId: productId },
-      data: inputProduct,
+      data: updateProductDto,
+      include: { order: true },
     });
   }
 
-  async delete(productId: string): Promise<ProductEntity> {
+  async delete(productId: string): Promise<Products> {
     await this.findById(productId);
     return await this.repositoriesService.products.delete({
       where: { productId: productId },
+      include: { order: true },
     });
   }
 
-  async findById(productId: string): Promise<ProductEntity> {
+  async findById(productId: string): Promise<Products> {
     const product = await this.repositoriesService.products.findUnique({
       where: { productId: productId },
       include: { order: true },
@@ -54,7 +62,7 @@ export class ProductsService {
     return product;
   }
 
-  async findAll(): Promise<ProductEntity[]> {
+  async findAll(): Promise<Products[]> {
     return await this.repositoriesService.products.findMany({
       include: { order: true },
     });
