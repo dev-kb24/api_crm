@@ -1,16 +1,22 @@
-import { Exclude } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
+import { OutputOrderDto } from '@/order/dto/output-order.dto';
+import { Order, Pictures } from '@prisma/client';
+import { Exclude, Transform } from 'class-transformer';
 export class OutputUserDto {
-  @ApiProperty()
-  userId: string;
-  @ApiProperty()
-  email: string;
-  @ApiProperty()
-  firstname: string;
-  @ApiProperty()
-  lastname: string;
+  readonly userId: string;
+  readonly email: string;
+  readonly civility: number;
+  readonly firstname: string;
+  readonly lastname: string;
   @Exclude()
-  password: string;
+  readonly password: string;
+  readonly fonction: string;
+  readonly avatar: Pictures;
+  @Exclude()
+  readonly ordersId: Array<string>;
+  @Transform(({ value }) =>
+    value.map((order: Order) => new OutputOrderDto(order)),
+  )
+  readonly order: Array<Order>;
 
   constructor(partial: Partial<OutputUserDto>) {
     Object.assign(this, partial);

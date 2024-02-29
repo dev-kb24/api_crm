@@ -1,23 +1,43 @@
-import { Exclude } from 'class-transformer';
-import { OrderEntity } from '@/order/entities/order.entity';
+import { Exclude, Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { Categories, Order, Pictures, References } from '@prisma/client';
+import { OutputOrderDto } from '@/order/dto/output-order.dto';
 export class OutputProductDto {
   @ApiProperty()
-  productId: string;
+  readonly productId: string;
   @ApiProperty()
-  name: string;
+  readonly name: string;
   @ApiProperty()
-  comment: string;
+  readonly comment: string;
   @ApiProperty()
-  stock: number;
+  readonly price: number;
   @ApiProperty()
-  created_at: Date;
+  readonly stock: number;
   @ApiProperty()
-  updated_at: Date;
+  readonly created_at: Date;
+  @ApiProperty()
+  readonly updated_at: Date;
+  @ApiProperty()
+  readonly reference: References;
+  @ApiProperty()
+  readonly product_picture: Pictures[];
+  @ApiProperty()
+  readonly weight: number;
+  @ApiProperty()
+  readonly height: number;
+  @ApiProperty()
+  readonly width: number;
+  @ApiProperty()
+  readonly length: number;
   @Exclude()
-  ordersId: Array<string>;
+  readonly ordersId: Array<string>;
   @ApiProperty()
-  order: Array<OrderEntity>;
+  @Transform(({ value }) =>
+    value.map((order: Order) => new OutputOrderDto(order)),
+  )
+  readonly order: Array<Order>;
+  @ApiProperty()
+  readonly categories: Array<Categories>;
 
   constructor(partial: Partial<OutputProductDto>) {
     Object.assign(this, partial);

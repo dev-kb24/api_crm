@@ -1,14 +1,25 @@
 import { SigninUserDto } from '../dto/signin-user.dto';
 import { SignupUserDto } from '../dto/signup-user.dto';
+import { Pictures, Users } from '@prisma/client';
 import { UpdateUserPasswordDto } from '../dto/update-user-password.dto';
-import { UserEntity } from '../entity/userEntity';
 
-export const userEntityMock: UserEntity = {
+const pictureMock: Pictures = {
+  path: 'path',
+  name: 'name',
+  format: 'format',
+  created_at: new Date(),
+};
+
+export const userEntityMock: Users = {
   userId: '1234567891234567',
   email: 'test@test.fr',
   password: 'password',
+  civility: 1,
   firstname: 'firstname',
   lastname: 'lastname',
+  fonction: 'test fonction',
+  avatar: pictureMock,
+  ordersId: ['1234567891234567'],
 };
 
 export const expectedUserEntityMock: any = {
@@ -21,8 +32,12 @@ export const expectedUserEntityMock: any = {
 export const signupUserDtoMock: SignupUserDto = {
   email: 'test@test.fr',
   password: 'password',
+  civility: 1,
   firstname: 'firstname',
   lastname: 'lastname',
+  fonction: 'test fonction',
+  avatar: pictureMock,
+  ordersId: ['1234567891234567'],
 };
 
 export const signinUserDtoMock: SigninUserDto = {
@@ -33,8 +48,12 @@ export const signinUserDtoMock: SigninUserDto = {
 export const updateUserDtoMock: SignupUserDto = {
   email: 'test@test.fr',
   password: 'password',
+  civility: 1,
   firstname: 'firstname',
   lastname: 'lastname',
+  fonction: 'test fonction',
+  avatar: pictureMock,
+  ordersId: ['1234567891234567'],
 };
 
 export const updateUserPasswordDtoMock: UpdateUserPasswordDto = {

@@ -3,11 +3,13 @@ import {
   IsString,
   IsOptional,
   IsDateString,
-  IsObject,
   IsArray,
+  ValidateNested,
 } from 'class-validator';
-import { AddressEntity } from '@/order/entities/address.entity';
-import { PicturesEntity } from '@/order/entities/pictures.entity';
+import { AddressType } from '@/utils/types/address.type';
+import { Address, Pictures } from '@prisma/client';
+import { Type } from 'class-transformer';
+import { PicturesType } from '@/utils/types/pictures.type';
 import { ApiProperty } from '@nestjs/swagger';
 export class CreateOrderDto {
   @IsString()
@@ -20,10 +22,9 @@ export class CreateOrderDto {
   @ApiProperty()
   readonly comment: string;
 
-  @IsObject()
-  @IsNotEmpty()
-  @ApiProperty()
-  readonly address: AddressEntity;
+  @ValidateNested()
+  @Type(() => AddressType)
+  readonly address: Address;
 
   @IsDateString()
   @IsOptional()
@@ -50,13 +51,11 @@ export class CreateOrderDto {
   @ApiProperty()
   readonly productsId: string[];
 
-  @IsObject()
-  @IsOptional()
-  @ApiProperty()
-  readonly picture_before: PicturesEntity;
+  @ValidateNested({ each: true })
+  @Type(() => PicturesType)
+  readonly picture_before: Pictures[];
 
-  @IsObject()
-  @IsOptional()
-  @ApiProperty()
-  readonly picture_after: PicturesEntity;
+  @ValidateNested({ each: true })
+  @Type(() => PicturesType)
+  readonly picture_after: Pictures[];
 }

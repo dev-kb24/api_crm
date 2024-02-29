@@ -22,6 +22,8 @@ describe('OrderController', () => {
     }).compile();
 
     controller = module.get<OrderController>(OrderController);
+    jest.mock('class-transformer');
+    jest.mock('class-validator');
   });
 
   it('should be create order', async () => {

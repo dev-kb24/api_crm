@@ -5,14 +5,14 @@ import {
 } from '@nestjs/common';
 import { RepositoriesService } from '@/repositories/repositories.service';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
-import { SuppliersEntity } from './entities/supplier.entity';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
+import { Suppliers } from '@prisma/client';
 
 @Injectable()
 export class SuppliersService {
   constructor(private readonly repositoriesService: RepositoriesService) {}
 
-  async create(createSupplierDto: CreateSupplierDto): Promise<SuppliersEntity> {
+  async create(createSupplierDto: CreateSupplierDto): Promise<Suppliers> {
     const { raisonSocial } = createSupplierDto;
     const supplierExist = await this.repositoriesService.suppliers.findFirst({
       where: { raisonSocial: raisonSocial },
@@ -25,11 +25,11 @@ export class SuppliersService {
     });
   }
 
-  async findAll(): Promise<SuppliersEntity[]> {
+  async findAll(): Promise<Suppliers[]> {
     return await this.repositoriesService.suppliers.findMany();
   }
 
-  async findById(supplierId: string): Promise<SuppliersEntity> {
+  async findById(supplierId: string): Promise<Suppliers> {
     const supplier = await this.repositoriesService.suppliers.findUnique({
       where: { suppliersId: supplierId },
     });
@@ -42,7 +42,7 @@ export class SuppliersService {
   async update(
     supplierId: string,
     updateSupplierDto: UpdateSupplierDto,
-  ): Promise<SuppliersEntity> {
+  ): Promise<Suppliers> {
     await this.findById(supplierId);
     return await this.repositoriesService.suppliers.update({
       where: { suppliersId: supplierId },
@@ -50,7 +50,7 @@ export class SuppliersService {
     });
   }
 
-  async delete(supplierId: string): Promise<SuppliersEntity> {
+  async delete(supplierId: string): Promise<Suppliers> {
     await this.findById(supplierId);
     return await this.repositoriesService.suppliers.delete({
       where: { suppliersId: supplierId },

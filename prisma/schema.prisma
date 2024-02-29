@@ -14,8 +14,11 @@ model Users {
   userId String @id @default(auto()) @map("_id") @db.ObjectId
   email String @unique
   password String
+  civility Int?
   firstname String?
   lastname String?
+  fonction String?
+  avatar Pictures?
   ordersId String[] @db.ObjectId 
   order Order[] @relation(name: "usersOrder",fields: [ordersId],references:[orderId])
 }
@@ -29,14 +32,26 @@ model Products {
   stock Int? @default(0)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+  reference References?
+  product_picture Pictures[]
+  weight Float?
+  height Float?
+  width Float?
+  length Float?
   ordersId String[] @db.ObjectId
   order Order[] @relation(name: "productsOrder",fields: [ordersId],references:[orderId])
+  categories Categories[]
 }
 
 
 model Suppliers {
   suppliersId String @id @default(auto()) @map("_id") @db.ObjectId
   raisonSocial String 
+  note String?
+  informations Informations?
+  coordonnees Coordonnees?
+  supplier_contact Supplier_contact[]
+  legal Legal?
 }
 
 model Order {
@@ -58,6 +73,7 @@ model Order {
 }
 
 type Address {
+  name_address String 
   street String
   city String
   zip String
@@ -69,3 +85,51 @@ type Pictures {
   format String
   created_at DateTime @default(now())
 }
+
+type References {
+  id String
+  model String
+  mark String
+}
+
+type Categories {
+  name String
+  comment String
+  created_at DateTime @default(now()) 
+  productsId String[] @db.ObjectId
+}
+
+type Informations {
+  type_supplier Boolean
+  society_name String
+  site_web String
+}
+
+type Coordonnees {
+  phone String
+  email String
+  mobile String
+  adress Address[]
+}
+
+type Supplier_contact {
+  principal_contact Boolean
+  firstname String
+  lastname String
+  email String
+  phone String
+  mobile String
+  fonction String
+}
+
+type Legal {
+  status String
+  siret String
+  siren String
+  naf String
+  capital String
+  rcs String
+  tva String
+}
+
+
