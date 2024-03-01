@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ProductsService } from './products.service';
+import { ProductsService } from '../../../src/products/products.service';
 import { RepositoriesService } from '@/repositories/repositories.service';
 import { RepositoriesServiceMock } from '@/repositories/mocks/repositories.service.mock';
 import {
   productEntityMock,
   createProductDtoMock,
-} from './mocks/product.entity.mock';
+} from '../../../src/products/mocks/product.entity.mock';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 
 describe('ProductsService', () => {

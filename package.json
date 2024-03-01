@@ -13,10 +13,9 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest --config jest-tu.json",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:unitaire": "jest --config ./configs/jest.config.ts",
+    "test:e2e": "jest --config ./configs/e2e.config.ts",
+    "test:cucumber": "cucumber-js --require-module ts-node/register --require src/features/**/*.ts src/features/**/*.feature",
     "prisma:generate": "npx prisma generate",
     "prepare": "husky"
   },
@@ -31,6 +30,7 @@
     "@nestjs/swagger": "^7.1.11",
     "@nestjs/testing": "^10.2.6",
     "@prisma/client": "^5.10.2",
+    "axios": "^1.6.7",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
@@ -42,6 +42,8 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@cucumber/cucumber": "^10.3.1",
+    "@jest/types": "^29.6.3",
     "@nestjs/cli": "^10.1.18",
     "@nestjs/schematics": "^10.0.2",
     "@types/bcrypt": "^5.0.2",
@@ -61,6 +63,7 @@
     "prettier": "^2.3.2",
     "prisma": "^5.10.2",
     "source-map-support": "^0.5.20",
+    "supertest": "^6.3.4",
     "ts-jest": "29.1.0",
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",

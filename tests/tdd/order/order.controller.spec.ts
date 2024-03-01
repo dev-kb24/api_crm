@@ -5,7 +5,7 @@ import { OrderService } from '@/order/order.service';
 import {
   createOrderDtoMock,
   expectedOrderEntityMock,
-} from './mocks/order.entity.mock';
+} from '../../../src/order/mocks/order.entity.mock';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 describe('OrderController', () => {

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { OrderService } from '@/order/order.service';
 import { RepositoriesServiceMock } from '@/repositories/mocks/repositories.service.mock';
 import { RepositoriesService } from '@/repositories/repositories.service';
-import { createOrderDtoMock, orderEntityMock } from './mocks/order.entity.mock';
+import { createOrderDtoMock, orderEntityMock } from '../../../src/order/mocks/order.entity.mock';
 import {
   BadRequestException,
   ConflictException,
