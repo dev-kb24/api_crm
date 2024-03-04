@@ -17,7 +17,9 @@
     "test:e2e": "jest --config ./configs/e2e.config.ts",
     "test:cucumber": "cucumber-js --require-module ts-node/register --require src/features/**/*.ts src/features/**/*.feature",
     "prisma:generate": "npx prisma generate",
-    "prepare": "husky"
+    "prepare": "husky",
+    "docker:build": "docker build -t template-crm .",
+    "docker:run": "docker run -p 3000:3000 template-crm"
   },
   "dependencies": {
     "@nestjs/common": "^10.2.6",
