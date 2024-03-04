@@ -48,5 +48,6 @@ export class SignupUserDto {
 
   @ApiPropertyOptional()
   @IsArray()
+  @IsOptional()
   readonly ordersId: Array<string>;
 }

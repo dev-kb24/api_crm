@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SuppliersController } from './suppliers.controller';
-import { SuppliersService } from './suppliers.service';
-import { SupplierServiceMock } from './mocks/supplier.service.mock';
+import { SuppliersController } from '../../../src/suppliers/suppliers.controller';
+import { SuppliersService } from '../../../src/suppliers/suppliers.service';
+import { SupplierServiceMock } from '../../../src/suppliers/mocks/supplier.service.mock';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -9,7 +9,7 @@ import {
   expectedSupplierEntityMock,
   supplierEntityMock,
   updateSupplierDtoMock,
-} from './mocks/supplier.entity.mock';
+} from '../../../src/suppliers/mocks/supplier.entity.mock';
 
 describe('SuppliersController', () => {
   let controller: SuppliersController;

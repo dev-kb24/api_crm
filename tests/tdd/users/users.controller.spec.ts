@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UsersController } from './users.controller';
-import { UsersService } from './users.service';
-import { UsersServiceMock } from './mocks/users.service.mock';
+import { UsersController } from '../../../src/users/users.controller';
+import { UsersService } from '../../../src/users/users.service';
+import { UsersServiceMock } from '../../../src/users/mocks/users.service.mock';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -11,7 +11,7 @@ import {
   updateUserDtoMock,
   updateUserPasswordDtoMock,
   userEntityMock,
-} from './mocks/users.entity.mock';
+} from '../../../src/users/mocks/users.entity.mock';
 
 describe('UsersController', () => {
   let controller: UsersController;

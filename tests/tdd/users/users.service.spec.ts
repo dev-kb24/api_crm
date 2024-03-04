@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UsersService } from './users.service';
+import { UsersService } from '../../../src/users/users.service';
 import { RepositoriesService } from '@/repositories/repositories.service';
 import { RepositoriesServiceMock } from '@/repositories/mocks/repositories.service.mock';
 import { ConfigService } from '@nestjs/config';
@@ -12,14 +12,14 @@ import {
   updateUserDtoMock,
   updateUserPasswordDtoMock,
   userEntityMock,
-} from './mocks/users.entity.mock';
+} from '../../../src/users/mocks/users.entity.mock';
 import {
   ConflictException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { jwtServiceMock } from './mocks/jwt.service.mock';
+import { jwtServiceMock } from '../../../src/users/mocks/jwt.service.mock';
 
 describe('UsersService', () => {
   let service: UsersService;

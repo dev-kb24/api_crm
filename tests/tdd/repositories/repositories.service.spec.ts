@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { RepositoriesService } from './repositories.service';
+import { RepositoriesService } from '../../../src/repositories/repositories.service';
 import { ConfigService } from '@nestjs/config';
 
 describe('RepositoriesService', () => {

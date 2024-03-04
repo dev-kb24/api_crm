@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ProductsController } from './products.controller';
-import { ProductsService } from './products.service';
-import { ProductServiceMock } from './mocks/product.service.mock';
+import { ProductsController } from '../../../src/products/products.controller';
+import { ProductsService } from '../../../src/products/products.service';
+import { ProductServiceMock } from '../../../src/products/mocks/product.service.mock';
 import {
   createProductDtoMock,
   expectedProductEntityMock,
   productEntityMock,
-} from './mocks/product.entity.mock';
+} from '../../../src/products/mocks/product.entity.mock';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 

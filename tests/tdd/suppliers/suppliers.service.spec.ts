@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SuppliersService } from './suppliers.service';
+import { SuppliersService } from '../../../src/suppliers/suppliers.service';
 import {
   createSupplierDtoMock,
   supplierEntityMock,
   updateSupplierDtoMock,
-} from './mocks/supplier.entity.mock';
+} from '../../../src/suppliers/mocks/supplier.entity.mock';
 import { RepositoriesService } from '@/repositories/repositories.service';
 import { RepositoriesServiceMock } from '@/repositories/mocks/repositories.service.mock';
 import { ConflictException, NotFoundException } from '@nestjs/common';
