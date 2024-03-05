@@ -1,0 +1,38 @@
+version: "3.8"
+services:
+  mongo:
+    image: prismagraphql/mongo-single-replica:5.0.3
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "apicrm"
+      MONGO_INITDB_ROOT_PASSWORD: "admin"
+      MONGO_INITDB_DATABASE: "crm"
+      MONGO_REPLICA_HOST: "mongo"
+      MONGO_REPLICA_PORT: "27017"
+    ports:
+      - 27017:27017
+  api:
+    image: template-crm
+    command:
+      - /bin/bash
+      - -c
+      - |
+        npm run prisma:generate
+        npm run prisma:push
+        npm run test:unitaire
+        npm run start:dev
+    ports:
+      - 3000:3000
+    depends_on:
+      - mongo
+    environment:
+      DATABASE_URL: "mongodb://apicrm:admin@mongo:27017/crm?authSource=admin&directConnection=true"
+      MAIL_HOST: "mailhog"
+      MAIL_PORT: 1025
+      JWT_SECRET: "Azerty@2408"
+  mailhog:
+    image: mailhog/mailhog
+    logging:
+      driver: 'none'
+    ports:
+      - 1025:1025
+      - 8025:8025

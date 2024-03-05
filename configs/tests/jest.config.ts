@@ -8,7 +8,7 @@ const config: Config.InitialOptions = {
   testEnvironment: "node",
   testMatch: ["**/tests/tdd/**/*.spec.ts"],
   preset: "ts-jest",
-  rootDir: "../",
+  rootDir: "../../",
   coverageDirectory: "<rootDir>/coverage",
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1"

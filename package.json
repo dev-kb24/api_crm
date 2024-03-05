@@ -13,13 +13,16 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test:unitaire": "jest --config ./configs/jest.config.ts",
-    "test:e2e": "jest --config ./configs/e2e.config.ts",
+    "test:unitaire": "jest --config ./configs/tests/jest.config.ts",
+    "test:e2e": "jest --config ./configs/tests/e2e.config.ts",
     "test:cucumber": "cucumber-js --require-module ts-node/register --require src/features/**/*.ts src/features/**/*.feature",
     "prisma:generate": "npx prisma generate",
+    "prisma:push":"npx prisma db push",
     "prepare": "husky",
-    "docker:build": "docker build -t template-crm .",
-    "docker:run": "docker run -p 3000:3000 template-crm"
+    "docker:build:mongo":"docker pull prismagraphql/mongo-single-replica:5.0.3",
+    "docker:build:mailhog":"docker pull mailhog/mailhog",
+    "docker:build:api": "docker build -t template-crm .",
+    "docker:run:env":"docker-compose up -d"
   },
   "dependencies": {
     "@nestjs/common": "^10.2.6",
