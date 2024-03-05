@@ -22,8 +22,10 @@ export class CreateOrderDto {
   @ApiProperty()
   readonly comment: string;
 
+  @ApiProperty()
   @ValidateNested()
   @Type(() => AddressType)
+  @IsOptional()
   readonly address: Address;
 
   @IsDateString()
@@ -53,9 +55,13 @@ export class CreateOrderDto {
 
   @ValidateNested({ each: true })
   @Type(() => PicturesType)
+  @IsOptional()
+  @ApiProperty()
   readonly picture_before: Pictures[];
 
   @ValidateNested({ each: true })
   @Type(() => PicturesType)
+  @IsOptional()
+  @ApiProperty()
   readonly picture_after: Pictures[];
 }

@@ -14,9 +14,10 @@ import { SuppliersService } from './suppliers.service';
 import { UsersGuard } from '@/users/users.guard';
 import { OutputSupplierDto } from './dto/output-supplier.dto';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
-import { ApiOkResponse, ApiBody, ApiNoContentResponse } from '@nestjs/swagger';
+import { ApiOkResponse, ApiBody, ApiNoContentResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('suppliers')
+@ApiTags("Suppliers")
 export class SuppliersController {
   constructor(private readonly suppliersService: SuppliersService) {}
 

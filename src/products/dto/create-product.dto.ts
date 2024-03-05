@@ -37,11 +37,13 @@ export class CreateProductDto {
   @ApiProperty()
   @ValidateNested()
   @Type(() => ReferencesType)
+  @IsOptional()
   readonly reference: References;
 
   @ApiProperty()
   @ValidateNested({ each: true })
   @Type(() => PicturesType)
+  @IsOptional()
   readonly product_picture: Pictures[];
 
   @ApiProperty()
@@ -71,5 +73,6 @@ export class CreateProductDto {
   @ApiProperty()
   @ValidateNested({ each: true })
   @Type(() => CategoriesType)
+  @IsOptional()
   readonly categories: Categories[];
 }
