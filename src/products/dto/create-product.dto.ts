@@ -68,6 +68,7 @@ export class CreateProductDto {
 
   @ApiProperty()
   @IsArray()
+  @IsOptional()
   readonly ordersId: Array<string>;
 
   @ApiProperty()

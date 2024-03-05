@@ -6,21 +6,21 @@ const config: Config.InitialOptions = {
   collectCoverage: true,
   moduleFileExtensions: ["js", "json", "ts"],
   testEnvironment: "node",
-  testMatch: ["**/tests/e2e/*.spec.ts"],
+  testMatch: ["**/tests/e2e/**/*.spec.ts"],
   preset: "ts-jest",
-  rootDir: "./",
+  rootDir: "../../",
   coverageDirectory: "<rootDir>/coverage",
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1"
   },
   collectCoverageFrom: [
-    "**/*.ts",
-    "!**/*.spec.ts",
-    "!**/utils/types/**",
-    "!**/e2e/**",
+    "**/src/**/*.ts",
+    "!**/configs/**",
+    "!**/tests/**",
     "!**/**/dto/**",
     "!**/**/mocks/**",
-    "!**/*.module.ts"
+    "!**/src/main.ts",
+    "!**/dist/**"
   ],
   testPathIgnorePatterns: [
     "/node_modules/",

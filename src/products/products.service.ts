@@ -24,7 +24,7 @@ export class ProductsService {
       data: {
         ...createProductDto,
         order: {
-          connect: createProductDto.ordersId.map((orderId) => ({ orderId })),
+          connect: createProductDto?.ordersId?.map((orderId) => ({ orderId })),
         },
       },
       include: { order: true },

@@ -6,6 +6,9 @@ import {
   IsNumber,
   ValidateNested,
   IsArray,
+  Length,
+  MinLength,
+  IsStrongPassword,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
@@ -14,11 +17,14 @@ export class SignupUserDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsEmail()
+  @Length(0, 255)
   readonly email: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
+  @MinLength(8)
+  @IsStrongPassword()
   password: string;
 
   @ApiPropertyOptional()
@@ -29,11 +35,13 @@ export class SignupUserDto {
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
+  @Length(3, 60)
   readonly firstname: string;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
+  @Length(3, 60)
   readonly lastname: string;
 
   @ApiPropertyOptional()

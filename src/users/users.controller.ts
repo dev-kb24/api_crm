@@ -9,6 +9,7 @@ import {
   Get,
   UseInterceptors,
   ClassSerializerInterceptor,
+  HttpCode,
 } from '@nestjs/common';
 import { SignupUserDto } from './dto/signup-user.dto';
 import { UsersService } from './users.service';
@@ -39,6 +40,7 @@ export class UsersController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Post('signin')
+  @HttpCode(200)
   @ApiOkResponse({ description: 'Opération réussie', type: OutputUserDto })
   @ApiBody({ type: SigninUserDto })
   async signin(@Body() signinUserDto: SigninUserDto): Promise<OutputUserDto> {
