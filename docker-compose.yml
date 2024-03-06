@@ -10,7 +10,7 @@ services:
       MONGO_REPLICA_HOST: "mongo"
       MONGO_REPLICA_PORT: "27017"
     ports:
-      - 27017:27017
+      - 27018:27017 #27018 pour éviter le conflit avec le port local
   api:
     image: template-crm
     command:
