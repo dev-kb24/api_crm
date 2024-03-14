@@ -48,7 +48,7 @@ model Products {
 
 model Suppliers {
   suppliersId String @id @default(auto()) @map("_id") @db.ObjectId
-  raisonSocial String 
+  raisonSocial String @unique
   note String?
   informations Informations?
   coordonnees Coordonnees?

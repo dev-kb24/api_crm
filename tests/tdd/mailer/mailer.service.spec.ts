@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
-import {MailService} from "@/mailer/mail.service";
-import {MockConfigService} from "@/mailer/mocks/mail.config.mock"
+import { MailService } from '@/mailer/mail.service';
+import { MockConfigService } from '@/mailer/mocks/mail.config.mock';
 
 describe('MailService', () => {
   let mailService: MailService;
@@ -22,7 +22,6 @@ describe('MailService', () => {
   });
 
   it('should send email', async () => {
- 
     const user = { email: 'test@example.com' };
     const subject = 'Test Subject';
     const temp = 'create_user';
@@ -32,12 +31,15 @@ describe('MailService', () => {
     };
     jest.spyOn(mailService as any, 'main').mockReturnValue(mockTransporter);
 
-    const mockTemplate = jest.fn().mockReturnValue('<html><body>Test</body></html>');
-    jest.spyOn(mailService as any, 'prepareTemplate').mockReturnValue(mockTemplate);
+    const mockTemplate = jest
+      .fn()
+      .mockReturnValue('<html><body>Test</body></html>');
+    jest
+      .spyOn(mailService as any, 'prepareTemplate')
+      .mockReturnValue(mockTemplate);
 
     await mailService.sendEmail(user as any, subject, temp);
 
-  
     expect(mockTransporter.sendMail).toHaveBeenCalledWith({
       from: 'admin@admin.fr',
       to: 'test@example.com',

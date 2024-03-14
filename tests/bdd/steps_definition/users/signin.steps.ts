@@ -1,8 +1,11 @@
-import { Given} from '@cucumber/cucumber';
+import { Given } from '@cucumber/cucumber';
 
-Given('Je remplis le formulaire de connexion : {string} et {string}', function (email,password) {
-  this.registrationData = { 
-    email: email, 
-    password: password
-  };
-});
+Given(
+  'Je remplis le formulaire de connexion : {string} et {string}',
+  function (email, password) {
+    this.registrationData = {
+      email: email,
+      password: password,
+    };
+  },
+);

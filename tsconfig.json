@@ -23,5 +23,5 @@
       "@/*": ["*"]
     }
   },
-  "include": ["src/**/*", "tests/tdd/app.controller.spec.ts", "tests/bdd/features", "tests/tdd/users/users.controller.spec.ts", "tests/tdd/users/users.guard.spec.ts", "tests/tdd/users/users.service.spec.ts", "tests/tdd/suppliers/suppliers.controller.spec.ts", "tests/tdd/suppliers/suppliers.service.spec.ts", "tests/tdd/products/products.controller.spec.ts", "tests/tdd/products/products.service.spec.ts", "tests/tdd/order/order.controller.spec.ts", "tests/tdd/order/order.service.spec.ts", "tests/tdd/repositories/repositories.service.spec.ts"],
+  "include": ["src/**/*", "tests/tdd/**/*.spec.ts", "tests/e2e/**/*.spec.ts", "configs/**/*.config.ts"],
 }
