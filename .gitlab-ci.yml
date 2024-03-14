@@ -24,6 +24,9 @@ install:
 
 test:
   script:
-    - npm run test
+    - npm run test:unitaire
+    
+lint:
+  script:
     - npm run lint
 

@@ -1,4 +1,4 @@
-export class MockConfigService{
+export class MockConfigService {
   get(key: string): any {
     if (key === 'MAIL_HOST') {
       return 'smtp.example.com';
