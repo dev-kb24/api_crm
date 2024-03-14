@@ -22,58 +22,58 @@ export class CreateProductDto {
   @ApiProperty()
   @IsString()
   @IsOptional()
-  readonly comment: string;
+  readonly comment?: string;
 
   @ApiProperty()
   @IsNumber()
   @IsOptional()
-  readonly price: number;
+  readonly price?: number;
 
   @ApiProperty()
   @IsInt()
   @IsOptional()
-  readonly stock: number;
+  readonly stock?: number;
 
   @ApiProperty()
   @ValidateNested()
   @Type(() => ReferencesType)
   @IsOptional()
-  readonly reference: References;
+  readonly reference?: References;
 
   @ApiProperty()
   @ValidateNested({ each: true })
   @Type(() => PicturesType)
   @IsOptional()
-  readonly product_picture: Pictures[];
+  readonly product_picture?: Pictures[];
 
   @ApiProperty()
   @IsNumber()
   @IsOptional()
-  readonly weight: number;
+  readonly weight?: number;
 
   @ApiProperty()
   @IsNumber()
   @IsOptional()
-  readonly height: number;
+  readonly height?: number;
 
   @ApiProperty()
   @IsNumber()
   @IsOptional()
-  readonly width: number;
+  readonly width?: number;
 
   @ApiProperty()
   @IsNumber()
   @IsOptional()
-  readonly length: number;
+  readonly length?: number;
 
   @ApiProperty()
   @IsArray()
   @IsOptional()
-  readonly ordersId: Array<string>;
+  ordersId?: Array<string>;
 
   @ApiProperty()
   @ValidateNested({ each: true })
   @Type(() => CategoriesType)
   @IsOptional()
-  readonly categories: Categories[];
+  readonly categories?: Categories[];
 }

@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -14,21 +15,32 @@ export class ProductsService {
 
   async create(createProductDto: CreateProductDto): Promise<Products> {
     const { name } = createProductDto;
-    const productExist = await this.repositoriesService.products.findFirst({
-      where: { name: name },
-    });
+    let productExist: Products;
+    try {
+      productExist = await this.repositoriesService.products.findFirst({
+        where: { name: name },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
     if (productExist) {
       throw new ConflictException('product already exist');
     }
-    return await this.repositoriesService.products.create({
-      data: {
-        ...createProductDto,
-        order: {
-          connect: createProductDto?.ordersId?.map((orderId) => ({ orderId })),
+    try {
+      return await this.repositoriesService.products.create({
+        data: {
+          ...createProductDto,
+          order: {
+            connect: createProductDto?.ordersId?.map((orderId) => ({
+              orderId,
+            })),
+          },
         },
-      },
-      include: { order: true },
-    });
+        include: { order: true },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   async update(
@@ -36,26 +48,39 @@ export class ProductsService {
     productId: string,
   ): Promise<Products> {
     await this.findById(productId);
-    return await this.repositoriesService.products.update({
-      where: { productId: productId },
-      data: updateProductDto,
-      include: { order: true },
-    });
+    try {
+      return await this.repositoriesService.products.update({
+        where: { productId: productId },
+        data: updateProductDto,
+        include: { order: true },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   async delete(productId: string): Promise<Products> {
     await this.findById(productId);
-    return await this.repositoriesService.products.delete({
-      where: { productId: productId },
-      include: { order: true },
-    });
+    try {
+      return await this.repositoriesService.products.delete({
+        where: { productId: productId },
+        include: { order: true },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   async findById(productId: string): Promise<Products> {
-    const product = await this.repositoriesService.products.findUnique({
-      where: { productId: productId },
-      include: { order: true },
-    });
+    let product: Products;
+    try {
+      product = await this.repositoriesService.products.findUnique({
+        where: { productId: productId },
+        include: { order: true },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
     if (!product) {
       throw new NotFoundException(`ProductId : ${productId} not found`);
     }
@@ -63,8 +88,12 @@ export class ProductsService {
   }
 
   async findAll(): Promise<Products[]> {
-    return await this.repositoriesService.products.findMany({
-      include: { order: true },
-    });
+    try {
+      return await this.repositoriesService.products.findMany({
+        include: { order: true },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 }

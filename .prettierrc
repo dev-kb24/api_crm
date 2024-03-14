@@ -1,9 +1,4 @@
 {
   "singleQuote": true,
-  "trailingComma": "all",
-  "overrides": [
-    {
-      "files":["src/**/*.ts", "tests/**/*.ts", "configs/**/*.ts"]
-    }
-  ]
+  "trailingComma": "all"
 }
