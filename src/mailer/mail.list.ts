@@ -1,7 +1,9 @@
 const listMail = {
-  create_user: {
-    subject: 'User Created',
-    message: 'Ceci est un exemple de message dans le modèle Handlebars.',
+  create_user: (user: any) => {
+    return {
+      subject: `Validation de votre compte CRM`,
+      message: `Voici votre code de validation: ${user.code_email}`,
+    };
   },
 };
 export default listMail;

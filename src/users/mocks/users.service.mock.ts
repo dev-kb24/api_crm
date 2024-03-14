@@ -8,4 +8,5 @@ export class UsersServiceMock {
   getProfil = jest.fn().mockResolvedValue(expectedUserEntityMock);
   update = jest.fn().mockResolvedValue(expectedUserEntityMock);
   delete = jest.fn().mockResolvedValue("L'utilisateur a été supprimé");
+  validation = jest.fn().mockResolvedValue(true);
 }

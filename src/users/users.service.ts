@@ -1,6 +1,8 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -24,40 +26,54 @@ export class UsersService {
     private mailService: MailService,
   ) {}
 
-  private async hashPassword(password: string): Promise<string> {
+  private async hash(password: string): Promise<string> {
     try {
       const salt = await bcrypt.genSalt(
         parseInt(this.configService.get('SALT_ROUNDS')),
       );
       return await bcrypt.hash(password, salt);
     } catch (error) {
-      throw new ConflictException(
-        'Erreur lors du hashage du password ' + error,
-      );
+      throw new ConflictException('Erreur lors du hashage ' + error);
     }
   }
 
   async signup(signupUserDto: SignupUserDto): Promise<Users> {
+    let user: Users;
     const { email, password } = signupUserDto;
-    const userExist = await this.repositoriesService.users.findFirst({
-      where: { email: email },
-    });
+
+    const userExist: Users = await this.findByEmail(email);
+
     if (userExist) {
       throw new ConflictException('User already exist');
     }
-    signupUserDto.password = await this.hashPassword(password);
-    const user = await this.repositoriesService.users.create({
-      data: signupUserDto,
-    });
-    await this.mailService.sendEmail(user.email, 'user Created', 'create_user');
+
+    signupUserDto.password = await this.hash(password);
+    let code_email: string = (
+      Math.floor(Math.random() * (10000 - 1000 + 1)) + 1000
+    ).toString();
+    if (this.configService.get('NODE_ENV') === 'test') {
+      code_email = signupUserDto.code_email;
+    }
+    signupUserDto.code_email = await this.hash(code_email);
+    try {
+      user = await this.repositoriesService.users.create({
+        data: signupUserDto,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+    const dataMail = {
+      email: signupUserDto.email,
+      code_email: code_email,
+    };
+    await this.mailService.sendEmail(dataMail, 'user Created', 'create_user');
+
     return user;
   }
 
   async signin(signinUserDto: SigninUserDto): Promise<any> {
     const { email, password } = signinUserDto;
-    const userExist = await this.repositoriesService.users.findFirst({
-      where: { email: email },
-    });
+    const userExist: Users = await this.findByEmail(email);
     if (!userExist) {
       throw new NotFoundException('User not found');
     }
@@ -68,6 +84,7 @@ export class UsersService {
 
     return {
       access_token: await this.jwtService.signAsync(payload),
+      user: userExist,
     };
   }
 
@@ -84,22 +101,20 @@ export class UsersService {
     ) {
       throw new ConflictException('Le mot de passe est incorrect');
     }
-    const newPassword = await this.hashPassword(
+    const newPassword: string = await this.hash(
       updateUserPasswordDto.newPassword,
     );
-    return await this.repositoriesService.users.update({
-      where: { userId: userId },
-      data: { password: newPassword },
-      include: { order: true },
-    });
+    return await this.updateUser(
+      { userId: userId },
+      { password: newPassword },
+      { order: true },
+    );
   }
 
   async update(updateUserDto: UpdateUserDto, userId: string): Promise<Users> {
     await this.findById(userId);
-    return await this.repositoriesService.users.update({
-      where: { userId: userId },
-      data: updateUserDto,
-      include: { order: true },
+    return await this.updateUser({ userId: userId }, updateUserDto, {
+      order: true,
     });
   }
 
@@ -108,21 +123,69 @@ export class UsersService {
   }
 
   async delete(userId: string): Promise<Users> {
+    let user: Users;
     await this.findById(userId);
-    return await this.repositoriesService.users.delete({
-      where: { userId: userId },
-      include: { order: true },
-    });
+    try {
+      user = await this.repositoriesService.users.delete({
+        where: { userId: userId },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+    return user;
+  }
+
+  async validation(code_email: string, userId: string): Promise<boolean> {
+    const user = await this.findById(userId);
+    if (!(await bcrypt.compare(code_email, user.code_email))) {
+      throw new BadRequestException(
+        "Votre code de confirmation n'est pas le bon",
+      );
+    }
+
+    await this.updateUser({ userId: userId }, { user_is_valid: true });
+
+    return true;
   }
 
   async findById(userId: string): Promise<Users> {
-    const user = await this.repositoriesService.users.findUnique({
-      where: { userId: userId },
-      include: { order: true },
-    });
+    let user: Users;
+    try {
+      user = await this.repositoriesService.users.findUnique({
+        where: { userId: userId },
+        include: { order: true },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
     if (!user) {
       throw new NotFoundException(`UserId : ${userId} not found`);
     }
     return user;
+  }
+
+  async findByEmail(email: string): Promise<Users | null> {
+    let user: Users;
+    try {
+      user = await this.repositoriesService.users.findFirst({
+        where: { email: email },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+
+    return user;
+  }
+
+  async updateUser(where: any, data: any, include?: any): Promise<Users> {
+    try {
+      return await this.repositoriesService.users.update({
+        where,
+        data,
+        include,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 }

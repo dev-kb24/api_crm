@@ -49,6 +49,10 @@ export class SignupUserDto {
   @IsOptional()
   readonly fonction: string;
 
+  @IsString()
+  @IsOptional()
+  code_email: string;
+
   @ApiPropertyOptional()
   @ValidateNested()
   @Type(() => PicturesType)
