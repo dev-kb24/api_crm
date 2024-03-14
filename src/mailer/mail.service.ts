@@ -31,11 +31,11 @@ export class MailService {
     return Handlebars.compile(templateContent);
   }
 
-  async sendEmail(to: string, subject: string, temp: string) {
+  async sendEmail(user: any, subject: string, temp: string) {
     const transporter = this.main();
-    const mailTo = to;
+    const mailTo = user.email;
     const mailSubject = subject;
-    const mailContext = listMail[temp];
+    const mailContext = listMail[temp](user);
     const template = this.prepareTemplate();
     const html = template(mailContext);
     await transporter.sendMail({

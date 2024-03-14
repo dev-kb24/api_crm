@@ -10,6 +10,10 @@ export class OutputUserDto {
   @Exclude()
   readonly password: string;
   readonly fonction: string;
+  @Exclude()
+  readonly code_email: string;
+  @Exclude()
+  readonly user_is_valid: boolean;
   readonly avatar: Pictures;
   @Exclude()
   readonly ordersId: Array<string>;

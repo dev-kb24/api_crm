@@ -18,6 +18,8 @@ model Users {
   firstname String?
   lastname String?
   fonction String?
+  code_email String
+  user_is_valid Boolean @default(false)
   avatar Pictures?
   ordersId String[] @db.ObjectId 
   order Order[] @relation(name: "usersOrder",fields: [ordersId],references:[orderId])

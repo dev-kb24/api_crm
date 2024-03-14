@@ -18,6 +18,8 @@ export const userEntityMock: Users = {
   firstname: 'firstname',
   lastname: 'lastname',
   fonction: 'test fonction',
+  code_email: '12',
+  user_is_valid: false,
   avatar: pictureMock,
   ordersId: ['1234567891234567'],
 };
@@ -27,6 +29,7 @@ export const expectedUserEntityMock: any = {
   email: 'test@test.fr',
   firstname: 'firstname',
   lastname: 'lastname',
+  code_email: 1234,
 };
 
 export const signupUserDtoMock: SignupUserDto = {
@@ -36,6 +39,7 @@ export const signupUserDtoMock: SignupUserDto = {
   firstname: 'firstname',
   lastname: 'lastname',
   fonction: 'test fonction',
+  code_email: '12',
   avatar: pictureMock,
   ordersId: ['1234567891234567'],
 };
@@ -51,6 +55,7 @@ export const updateUserDtoMock: SignupUserDto = {
   civility: 1,
   firstname: 'firstname',
   lastname: 'lastname',
+  code_email: '12',
   fonction: 'test fonction',
   avatar: pictureMock,
   ordersId: ['1234567891234567'],

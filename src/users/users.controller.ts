@@ -44,7 +44,9 @@ export class UsersController {
   @ApiOkResponse({ description: 'Opération réussie', type: OutputUserDto })
   @ApiBody({ type: SigninUserDto })
   async signin(@Body() signinUserDto: SigninUserDto): Promise<OutputUserDto> {
-    return new OutputUserDto(await this.userService.signin(signinUserDto));
+    const signin = await this.userService.signin(signinUserDto);
+    signin.user = new OutputUserDto(signin.user);
+    return signin;
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -84,8 +86,6 @@ export class UsersController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(UsersGuard)
-  @UseInterceptors(ClassSerializerInterceptor)
-  @UseGuards(UsersGuard)
   @Delete(':id')
   @ApiNoContentResponse({ description: 'Le produit à été supprimé' })
   async delete(@Param('id') userId: string): Promise<string> {
@@ -98,5 +98,16 @@ export class UsersController {
   @ApiNoContentResponse({ description: 'Vous etes Autorisé !' })
   access(): string {
     return 'Vous etes Autorisé !';
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @UseGuards(UsersGuard)
+  @Put('validation/:id')
+  async validation(
+    @Body('code_email') code_email: string,
+    @Param('id') userId: string,
+  ): Promise<string> {
+    await this.userService.validation(code_email, userId);
+    return 'Votre compte est validé';
   }
 }
