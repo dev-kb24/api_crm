@@ -9,7 +9,7 @@
 
 # Official framework image. Look for the different tagged releases at:
 # https://hub.docker.com/r/library/node/tags/
-image: node:latest
+image: node:20.11.1
 
 
 # This folder is cached between builds
@@ -18,15 +18,19 @@ cache:
   paths:
     - node_modules/
 
+stages:
+  - install environnement
+  - testing
+
 install:
+  stage: install environnement
   script:
     - npm install
+    - npm run prisma:generate
 
 test:
+  stage: testing
   script:
     - npm run test:unitaire
-    
-lint:
-  script:
-    - npm run lint
+    - npm run lint 
 
