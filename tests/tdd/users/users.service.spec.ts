@@ -40,7 +40,7 @@ describe('UsersService', () => {
     service = module.get<UsersService>(UsersService);
   });
 
-  describe("signup user", () => {
+  describe('signup user', () => {
     it('should create user', async () => {
       service['repositoriesService']['users']['findFirst'] = jest
         .fn()
@@ -64,15 +64,19 @@ describe('UsersService', () => {
     it('Should return an error if the create function returns an error', async () => {
       try {
         service['repositoriesService']['users']['findFirst'] = jest
-        .fn()
-        .mockResolvedValue(undefined);
+          .fn()
+          .mockResolvedValue(undefined);
         service['repositoriesService']['users']['create'] = jest
-        .fn()
-        .mockRejectedValue(new Error("error lors de la création du l'utilisateur"));
+          .fn()
+          .mockRejectedValue(
+            new Error("error lors de la création du l'utilisateur"),
+          );
         await service.signup(signupUserDtoMock);
       } catch (error) {
         expect(error).toBeInstanceOf(InternalServerErrorException);
-        expect(error.message).toEqual('error lors de la création du l\'utilisateur');
+        expect(error.message).toEqual(
+          "error lors de la création du l'utilisateur",
+        );
       }
     });
 
@@ -89,9 +93,9 @@ describe('UsersService', () => {
         expect(error.message).toEqual('Erreur lors du hashage error');
       }
     });
-  })
+  });
 
-  describe("signin user", () => {
+  describe('signin user', () => {
     it('should signin user', async () => {
       service['repositoriesService']['users']['findFirst'] = jest
         .fn()
@@ -114,7 +118,7 @@ describe('UsersService', () => {
         expect(error.message).toEqual('User not found');
       }
     });
-  
+
     it('should return error if password is wrong', async () => {
       try {
         service['repositoriesService']['users']['findFirst'] = jest
@@ -127,11 +131,9 @@ describe('UsersService', () => {
         expect(error.message).toEqual('Le mot de passe est incorrect');
       }
     });
+  });
 
-  })
-
-  describe("update password", () => {
-
+  describe('update password', () => {
     it('should update password', async () => {
       service['repositoriesService']['users']['findFirst'] = jest
         .fn()
@@ -162,48 +164,50 @@ describe('UsersService', () => {
         expect(error.message).toEqual('Le mot de passe est incorrect');
       }
     });
+  });
 
-  })
-
-  describe("update user and validation email", () => {
+  describe('update user and validation email', () => {
     it('should update user', async () => {
-      const user = await service.update(updateUserDtoMock, userEntityMock.userId);
+      const user = await service.update(
+        updateUserDtoMock,
+        userEntityMock.userId,
+      );
       expect(user).toEqual(userEntityMock);
     });
 
     it('should Validate user', async () => {
       jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as never);
       service.findById = jest.fn().mockResolvedValue(userEntityMock);
-      const isValid = await service.validation("12", '1234567891234567');
+      const isValid = await service.validation('12', '1234567891234567');
       expect(isValid).toEqual(true);
     });
-  
+
     it('should return a badRequestException', async () => {
       jest.spyOn(bcrypt, 'compare').mockResolvedValue(false as never);
       service.findById = jest.fn().mockResolvedValue(userEntityMock);
       try {
-        await service.validation("1245", '1234567891234567');
+        await service.validation('1245', '1234567891234567');
       } catch (error) {
-        expect(error.message).toEqual("Votre code de confirmation n'est pas le bon");
+        expect(error.message).toEqual(
+          "Votre code de confirmation n'est pas le bon",
+        );
       }
     });
 
     it('Should return an error if the update function returns an error.', async () => {
       try {
-      service['repositoriesService']['users']['update'] = jest
-        .fn()
-        .mockRejectedValue(new Error("error update"))
-        await service.updateUser({userId:"123456"}, {test:'test'});
+        service['repositoriesService']['users']['update'] = jest
+          .fn()
+          .mockRejectedValue(new Error('error update'));
+        await service.updateUser({ userId: '123456' }, { test: 'test' });
       } catch (error) {
-      expect(error).toBeInstanceOf(InternalServerErrorException);
-      expect(error.message).toEqual(
-        `error update`,
-      );
+        expect(error).toBeInstanceOf(InternalServerErrorException);
+        expect(error.message).toEqual(`error update`);
       }
-    })
-  })
+    });
+  });
 
-  describe("find user", () => {
+  describe('find user', () => {
     it('should return an error if findById return undefined', async () => {
       try {
         service['repositoriesService']['users']['findUnique'] = jest
@@ -217,7 +221,7 @@ describe('UsersService', () => {
         );
       }
     });
-  
+
     it('sould get user by id', async () => {
       const user = await service.getProfil(userEntityMock.userId);
       expect(user).toEqual(userEntityMock);
@@ -225,51 +229,46 @@ describe('UsersService', () => {
 
     it('Should return an error if the findfirst function returns an error.', async () => {
       try {
-       service['repositoriesService']['users']['findFirst'] = jest
-         .fn()
-         .mockRejectedValue(new Error("error lors de la rechercher de l'email"))
-        await service.findByEmail("test@test.fr");
+        service['repositoriesService']['users']['findFirst'] = jest
+          .fn()
+          .mockRejectedValue(
+            new Error("error lors de la rechercher de l'email"),
+          );
+        await service.findByEmail('test@test.fr');
       } catch (error) {
-       expect(error).toBeInstanceOf(InternalServerErrorException);
-       expect(error.message).toEqual(
-         `error lors de la rechercher de l'email`,
-       );
+        expect(error).toBeInstanceOf(InternalServerErrorException);
+        expect(error.message).toEqual(`error lors de la rechercher de l'email`);
       }
-   })
+    });
     it('Should return an error if the findUnique function returns an error.', async () => {
       try {
-      service['repositoriesService']['users']['findUnique'] = jest
-        .fn()
-        .mockRejectedValue(new Error("error findUnique"))
-        await service.findById("123456789");
+        service['repositoriesService']['users']['findUnique'] = jest
+          .fn()
+          .mockRejectedValue(new Error('error findUnique'));
+        await service.findById('123456789');
       } catch (error) {
-      expect(error).toBeInstanceOf(InternalServerErrorException);
-      expect(error.message).toEqual(
-        `error findUnique`,
-      );
+        expect(error).toBeInstanceOf(InternalServerErrorException);
+        expect(error.message).toEqual(`error findUnique`);
       }
-  })
-  })
+    });
+  });
 
   describe('delete user', () => {
     it('should delete user', async () => {
       const user = await service.delete(userEntityMock.userId);
       expect(user).toEqual(userEntityMock);
     });
-  
+
     it('Should return an error if the delete function returns an error.', async () => {
       try {
         service['repositoriesService']['users']['delete'] = jest
           .fn()
-          .mockRejectedValue(new Error("error function delete"))
-          await service.delete(userEntityMock.userId);
+          .mockRejectedValue(new Error('error function delete'));
+        await service.delete(userEntityMock.userId);
       } catch (error) {
         expect(error).toBeInstanceOf(InternalServerErrorException);
-        expect(error.message).toEqual(
-          `error function delete`,
-        );
+        expect(error.message).toEqual(`error function delete`);
       }
     });
-  })
-
+  });
 });

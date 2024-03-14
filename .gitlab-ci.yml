@@ -31,6 +31,6 @@ install:
 test:
   stage: testing
   script:
-    - npm run test:unitaire
-    - npm run lint 
+    - npm run lint
+    - npm run test:unitaire 
 

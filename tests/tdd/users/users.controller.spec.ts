@@ -78,7 +78,7 @@ describe('UsersController', () => {
   });
 
   it('should can valide user', async () => {
-    const result = await controller.validation("1234", '1234567891234567');
+    const result = await controller.validation('1234', '1234567891234567');
     expect(result).toEqual('Votre compte est validé');
   });
 });

@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { RepositoriesService } from '@/repositories/repositories.service';
@@ -20,19 +21,32 @@ export class SuppliersService {
     if (supplierExist) {
       throw new ConflictException('supplier already exist');
     }
-    return await this.repositoriesService.suppliers.create({
-      data: createSupplierDto,
-    });
+    try {
+      return await this.repositoriesService.suppliers.create({
+        data: createSupplierDto,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   async findAll(): Promise<Suppliers[]> {
-    return await this.repositoriesService.suppliers.findMany();
+    try {
+      return await this.repositoriesService.suppliers.findMany();
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   async findById(supplierId: string): Promise<Suppliers> {
-    const supplier = await this.repositoriesService.suppliers.findUnique({
-      where: { suppliersId: supplierId },
-    });
+    let supplier: Suppliers;
+    try {
+      supplier = await this.repositoriesService.suppliers.findUnique({
+        where: { suppliersId: supplierId },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
     if (!supplier) {
       throw new NotFoundException(`SupplierId : ${supplierId} not found`);
     }
@@ -44,16 +58,24 @@ export class SuppliersService {
     updateSupplierDto: UpdateSupplierDto,
   ): Promise<Suppliers> {
     await this.findById(supplierId);
-    return await this.repositoriesService.suppliers.update({
-      where: { suppliersId: supplierId },
-      data: updateSupplierDto,
-    });
+    try {
+      return await this.repositoriesService.suppliers.update({
+        where: { suppliersId: supplierId },
+        data: updateSupplierDto,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   async delete(supplierId: string): Promise<Suppliers> {
     await this.findById(supplierId);
-    return await this.repositoriesService.suppliers.delete({
-      where: { suppliersId: supplierId },
-    });
+    try {
+      return await this.repositoriesService.suppliers.delete({
+        where: { suppliersId: supplierId },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 }
