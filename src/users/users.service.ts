@@ -74,9 +74,15 @@ export class UsersService {
   async signin(signinUserDto: SigninUserDto): Promise<any> {
     const { email, password } = signinUserDto;
     const userExist: Users = await this.findByEmail(email);
+
     if (!userExist) {
       throw new NotFoundException('User not found');
     }
+
+    if (!userExist.user_is_valid) {
+      throw new UnauthorizedException("Votre compte n'a pas été validé");
+    }
+
     if (!(await bcrypt.compare(password, userExist.password))) {
       throw new UnauthorizedException('Le mot de passe est incorrect');
     }
