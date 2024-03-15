@@ -19,7 +19,7 @@ export const userEntityMock: Users = {
   lastname: 'lastname',
   fonction: 'test fonction',
   code_email: '12',
-  user_is_valid: false,
+  user_is_valid: true,
   avatar: pictureMock,
   ordersId: ['1234567891234567'],
 };

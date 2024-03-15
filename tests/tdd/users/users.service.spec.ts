@@ -119,8 +119,22 @@ describe('UsersService', () => {
       }
     });
 
+    it('should return an error if the user is invalid', async () => {
+      try {
+        userEntityMock.user_is_valid = false;
+        service['repositoriesService']['users']['findFirst'] = jest
+          .fn()
+          .mockResolvedValue(userEntityMock);
+        await service.signin(signinUserDtoMock);
+      } catch (error) {
+        expect(error).toBeInstanceOf(UnauthorizedException);
+        expect(error.message).toEqual('Votre compte n\'a pas été validé');
+      }
+    });
+
     it('should return error if password is wrong', async () => {
       try {
+        userEntityMock.user_is_valid = true;
         service['repositoriesService']['users']['findFirst'] = jest
           .fn()
           .mockResolvedValue(userEntityMock);

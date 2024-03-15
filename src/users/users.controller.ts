@@ -101,7 +101,6 @@ export class UsersController {
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
-  @UseGuards(UsersGuard)
   @Put('validation/:id')
   async validation(
     @Body('code_email') code_email: string,

@@ -99,6 +99,63 @@ describe('Testing Users', () => {
     });
   });
 
+  describe('try signin user', () => {
+    it('/users/signin (POST) - throw error (user is invalid)', async () => {
+      const user = {
+        email: `test@test.fr`,
+        password: `Test@123`,
+      };
+      const result = await request(app.getHttpServer())
+        .post('/users/signin')
+        .send(user);
+      expect(result.status).toEqual(401);
+      expect(result.body.message).toEqual("Votre compte n'a pas été validé");
+    });
+  });
+
+  describe('validation user', () => {
+    it('/users/validation/:id (Validation Mail)', async () => {
+      const send = {
+        code_email: '1001',
+      };
+      const result = await request(app.getHttpServer())
+        .put(`/users/validation/${userId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(send);
+      expect(result.status).toEqual(200);
+      expect(result.text).toEqual('Votre compte est validé');
+    });
+
+    it('/users/validation/:id (Validation Mail) -  throw error (bad request)', async () => {
+      const send = {
+        code_email: '1002',
+      };
+      const result = await request(app.getHttpServer())
+        .put(`/users/validation/${userId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(send);
+      expect(result.status).toEqual(400);
+      expect(result.body.message).toEqual(
+        "Votre code de confirmation n'est pas le bon",
+      );
+    });
+
+    it('/users/validation/:id (Validation Mail) -  throw error (internal server)', async () => {
+      const send = {
+        code_email: '1001',
+      };
+      jest
+        .spyOn(repository.users, 'update')
+        .mockRejectedValue(new Error('internal server error'));
+      const result = await request(app.getHttpServer())
+        .put(`/users/validation/${userId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(send);
+      expect(result.status).toEqual(500);
+      expect(result.body.message).toEqual('internal server error');
+    });
+  });
+
   describe('signin user', () => {
     it('/users/signin (POST)', async () => {
       const user = {
@@ -348,72 +405,7 @@ describe('Testing Users', () => {
     });
   });
 
-  describe('validation and access', () => {
-    it('/users/validation/:id (Validation Mail)', async () => {
-      const send = {
-        code_email: '1001',
-      };
-      const result = await request(app.getHttpServer())
-        .put(`/users/validation/${userId}`)
-        .set('Authorization', `Bearer ${token}`)
-        .send(send);
-      expect(result.status).toEqual(200);
-      expect(result.text).toEqual('Votre compte est validé');
-    });
-
-    it('/users/validation/:id (Validation Mail) -  throw error (bad request)', async () => {
-      const send = {
-        code_email: '1002',
-      };
-      const result = await request(app.getHttpServer())
-        .put(`/users/validation/${userId}`)
-        .set('Authorization', `Bearer ${token}`)
-        .send(send);
-      expect(result.status).toEqual(400);
-      expect(result.body.message).toEqual(
-        "Votre code de confirmation n'est pas le bon",
-      );
-    });
-
-    it('/users/validation/:id (Validation Mail) -  throw error (internal server)', async () => {
-      const send = {
-        code_email: '1001',
-      };
-      jest
-        .spyOn(repository.users, 'update')
-        .mockRejectedValue(new Error('internal server error'));
-      const result = await request(app.getHttpServer())
-        .put(`/users/validation/${userId}`)
-        .set('Authorization', `Bearer ${token}`)
-        .send(send);
-      expect(result.status).toEqual(500);
-      expect(result.body.message).toEqual('internal server error');
-    });
-
-    it('/users/validation/:id (Validation Mail) -  throw error fake token (Unauthorized)', async () => {
-      const send = {
-        code_email: '1001',
-      };
-      const tokenFake = 'test_token';
-      const result = await request(app.getHttpServer())
-        .put(`/users/validation/${userId}`)
-        .set('Authorization', `Bearer ${tokenFake}`)
-        .send(send);
-      expect(result.status).toEqual(401);
-      expect(result.body.message).toEqual('Unauthorized');
-    });
-
-    it('/users/validation/:id (Validation Mail) -  throw error empty authorization (Unauthorized)', async () => {
-      const send = {
-        code_email: '1001',
-      };
-      const result = await request(app.getHttpServer())
-        .put(`/users/validation/${userId}`)
-        .send(send);
-      expect(result.status).toEqual(401);
-      expect(result.body.message).toEqual('Unauthorized');
-    });
-
+  describe('access user', () => {
     it('/users/access (Access user)', async () => {
       const result = await request(app.getHttpServer())
         .get(`/users/access/`)
