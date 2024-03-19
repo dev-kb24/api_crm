@@ -4,6 +4,10 @@ import * as request from 'supertest';
 import { AppModule } from '../../../src/app.module';
 import { v4 as uuidv4 } from 'uuid';
 import { RepositoriesService } from '../../../src/repositories/repositories.service';
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientUnknownRequestError,
+} from '@prisma/client/runtime/library';
 
 describe('Testing Suppliers', () => {
   let suppliersId: string;
@@ -11,6 +15,16 @@ describe('Testing Suppliers', () => {
   let app: INestApplication;
   let token: string;
   let repository: RepositoriesService;
+  const errorUnknow = new PrismaClientUnknownRequestError(
+    'internal server error',
+    {
+      clientVersion: 'client version test',
+    },
+  );
+  const errorKnow = new PrismaClientKnownRequestError('Error badRequest', {
+    clientVersion: 'client version test',
+    code: 'test code',
+  });
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -51,15 +65,23 @@ describe('Testing Suppliers', () => {
     });
 
     it('/suppliers (POST) - throw internal server error', async () => {
-      jest
-        .spyOn(repository.suppliers, 'create')
-        .mockRejectedValue(new Error('internal server error'));
+      jest.spyOn(repository.suppliers, 'create').mockRejectedValue(errorUnknow);
       const result = await request(app.getHttpServer())
         .post('/suppliers')
         .set('Authorization', `Bearer ${token}`)
         .send({ raisonSocial: `e2e test - ${uuid}-internal-server-error` });
       expect(result.status).toEqual(500);
-      expect(result.body.message).toEqual('internal server error');
+      expect(result.serverError).toEqual(true);
+    });
+
+    it('/suppliers (POST) - throw Error badRequest', async () => {
+      jest.spyOn(repository.suppliers, 'create').mockRejectedValue(errorKnow);
+      const result = await request(app.getHttpServer())
+        .post('/suppliers')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ raisonSocial: `e2e test - ${uuid}-internal-server-error` });
+      expect(result.status).toEqual(400);
+      expect(result.body.message).toEqual('Error badRequest');
     });
 
     it('/suppliers (POST) - throw Unauthorized (fake token)', async () => {
@@ -94,14 +116,25 @@ describe('Testing Suppliers', () => {
     it('/suppliers (GET) - throw internal error', async () => {
       jest
         .spyOn(repository.suppliers, 'findMany')
-        .mockRejectedValue(new Error('internal server error'));
+        .mockRejectedValue(errorUnknow);
 
       const result = await request(app.getHttpServer())
         .get('/suppliers')
         .set('Authorization', `Bearer ${token}`);
 
       expect(result.status).toEqual(500);
-      expect(result.body.message).toEqual('internal server error');
+      expect(result.serverError).toEqual(true);
+    });
+
+    it('/suppliers (GET) - throw Error badRequest', async () => {
+      jest.spyOn(repository.suppliers, 'findMany').mockRejectedValue(errorKnow);
+
+      const result = await request(app.getHttpServer())
+        .get('/suppliers')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(result.status).toEqual(400);
+      expect(result.body.message).toEqual('Error badRequest');
     });
 
     it('/suppliers (GET) - throw Unauthorized (fake token)', async () => {
@@ -144,12 +177,23 @@ describe('Testing Suppliers', () => {
     it('/suppliers/:id (GET) - throw internal server error', async () => {
       jest
         .spyOn(repository.suppliers, 'findUnique')
-        .mockRejectedValue(new Error('internal server error'));
+        .mockRejectedValue(errorUnknow);
       const result = await request(app.getHttpServer())
         .get(`/suppliers/${suppliersId}`)
         .set('Authorization', `Bearer ${token}`);
       expect(result.status).toEqual(500);
-      expect(result.body.message).toEqual('internal server error');
+      expect(result.serverError).toEqual(true);
+    });
+
+    it('/suppliers/:id (GET) - throw Error badRequest', async () => {
+      jest
+        .spyOn(repository.suppliers, 'findUnique')
+        .mockRejectedValue(errorKnow);
+      const result = await request(app.getHttpServer())
+        .get(`/suppliers/${suppliersId}`)
+        .set('Authorization', `Bearer ${token}`);
+      expect(result.status).toEqual(400);
+      expect(result.body.message).toEqual('Error badRequest');
     });
 
     it('/suppliers/:id (GET) - throw Unauthorized (fake token)', async () => {
@@ -194,15 +238,23 @@ describe('Testing Suppliers', () => {
     });
 
     it('/suppliers/:id (PUT) - throw internal server error', async () => {
-      jest
-        .spyOn(repository.suppliers, 'update')
-        .mockRejectedValue(new Error('internal server error'));
+      jest.spyOn(repository.suppliers, 'update').mockRejectedValue(errorUnknow);
       const result = await request(app.getHttpServer())
         .put(`/suppliers/${suppliersId}`)
         .set('Authorization', `Bearer ${token}`)
         .send({ raisonSocial: 'e2e test update' });
       expect(result.status).toEqual(500);
-      expect(result.body.message).toEqual('internal server error');
+      expect(result.serverError).toEqual(true);
+    });
+
+    it('/suppliers/:id (PUT) - throw Error badRequest', async () => {
+      jest.spyOn(repository.suppliers, 'update').mockRejectedValue(errorKnow);
+      const result = await request(app.getHttpServer())
+        .put(`/suppliers/${suppliersId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ raisonSocial: 'e2e test update' });
+      expect(result.status).toEqual(400);
+      expect(result.body.message).toEqual('Error badRequest');
     });
 
     it('/suppliers/:id (PUT) - throw Unauthorized (fake token)', async () => {
@@ -237,14 +289,21 @@ describe('Testing Suppliers', () => {
     });
 
     it('/suppliers/:id (DELETE) - throw internal server error', async () => {
-      jest
-        .spyOn(repository.suppliers, 'delete')
-        .mockRejectedValue(new Error('internal server error'));
+      jest.spyOn(repository.suppliers, 'delete').mockRejectedValue(errorUnknow);
       const result = await request(app.getHttpServer())
         .delete(`/suppliers/${suppliersId}`)
         .set('Authorization', `Bearer ${token}`);
       expect(result.status).toEqual(500);
-      expect(result.body.message).toEqual('internal server error');
+      expect(result.serverError).toEqual(true);
+    });
+
+    it('/suppliers/:id (DELETE) - throw Error badRequest', async () => {
+      jest.spyOn(repository.suppliers, 'delete').mockRejectedValue(errorKnow);
+      const result = await request(app.getHttpServer())
+        .delete(`/suppliers/${suppliersId}`)
+        .set('Authorization', `Bearer ${token}`);
+      expect(result.status).toEqual(400);
+      expect(result.body.message).toEqual('Error badRequest');
     });
 
     it('/suppliers/:id (DELETE) - throw Unauthorized (fake token)', async () => {

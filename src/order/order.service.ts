@@ -17,7 +17,6 @@ export class OrderService {
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
     const { name } = createOrderDto;
     await this.searchName(name);
-
     try {
       return await this.repositoriesService.order.create({
         data: {
@@ -35,7 +34,7 @@ export class OrderService {
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        throw new BadRequestException(error);
+        throw new BadRequestException(error.message);
       } else {
         throw new InternalServerErrorException(error);
       }
@@ -49,7 +48,7 @@ export class OrderService {
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        throw new BadRequestException(error);
+        throw new BadRequestException(error.message);
       } else {
         throw new InternalServerErrorException(error);
       }
@@ -65,7 +64,7 @@ export class OrderService {
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        throw new BadRequestException(error);
+        throw new BadRequestException(error.message);
       } else {
         throw new InternalServerErrorException(error);
       }
@@ -98,7 +97,7 @@ export class OrderService {
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        throw new BadRequestException(error);
+        throw new BadRequestException(error.message);
       } else {
         throw new InternalServerErrorException(error);
       }
@@ -113,7 +112,7 @@ export class OrderService {
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        throw new BadRequestException(error);
+        throw new BadRequestException(error.message);
       } else {
         throw new InternalServerErrorException(error);
       }
@@ -128,7 +127,7 @@ export class OrderService {
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        throw new BadRequestException(error);
+        throw new BadRequestException(error.message);
       } else {
         throw new InternalServerErrorException(error);
       }
