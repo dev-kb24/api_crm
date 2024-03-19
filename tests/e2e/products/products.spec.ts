@@ -4,6 +4,10 @@ import * as request from 'supertest';
 import { AppModule } from '../../../src/app.module';
 import { v4 as uuidv4 } from 'uuid';
 import { RepositoriesService } from '@/repositories/repositories.service';
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientUnknownRequestError,
+} from '@prisma/client/runtime/library';
 
 describe('testing products', () => {
   let app: INestApplication;
@@ -11,6 +15,16 @@ describe('testing products', () => {
   let idProduct: string;
   const uuid: string = uuidv4();
   let repository: RepositoriesService;
+  const errorUnknow = new PrismaClientUnknownRequestError(
+    'internal server error',
+    {
+      clientVersion: 'client version test',
+    },
+  );
+  const errorKnow = new PrismaClientKnownRequestError('Error badRequest', {
+    clientVersion: 'client version test',
+    code: 'test code',
+  });
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -50,28 +64,47 @@ describe('testing products', () => {
       expect(result.body.message).toEqual('product already exist');
     });
 
-    it('/products (POST) - throw internal server error (findFirst)', async () => {
+    it('/products (POST) - throw internal server error (findFirst 500)', async () => {
       jest
         .spyOn(repository.products, 'findFirst')
-        .mockRejectedValue(new Error('internal server error'));
+        .mockRejectedValue(errorUnknow);
       const result = await request(app.getHttpServer())
         .post('/products')
         .set('Authorization', `Bearer ${token}`)
         .send({ name: `e2e test - ${uuid}` });
       expect(result.status).toEqual(500);
-      expect(result.body.message).toEqual('internal server error');
+      expect(result.serverError).toEqual(true);
     });
 
-    it('/products (POST) - throw internal server error (create)', async () => {
-      jest
-        .spyOn(repository.products, 'create')
-        .mockRejectedValue(new Error('internal server error'));
+    it('/products (POST) - throw internal server error (findFirst 400)', async () => {
+      jest.spyOn(repository.products, 'findFirst').mockRejectedValue(errorKnow);
+      const result = await request(app.getHttpServer())
+        .post('/products')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name: `e2e test - ${uuid}` });
+      expect(result.status).toEqual(400);
+      expect(result.badRequest).toEqual(true);
+      expect(result.body.message).toEqual('Error badRequest');
+    });
+
+    it('/products (POST) - throw internal server error (create 500)', async () => {
+      jest.spyOn(repository.products, 'create').mockRejectedValue(errorUnknow);
       const result = await request(app.getHttpServer())
         .post('/products')
         .set('Authorization', `Bearer ${token}`)
         .send({ name: `e2e test - ${uuid}-internal-server-error` });
       expect(result.status).toEqual(500);
-      expect(result.body.message).toEqual('internal server error');
+      expect(result.serverError).toEqual(true);
+    });
+
+    it('/products (POST) - throw internal server error (create 400)', async () => {
+      jest.spyOn(repository.products, 'create').mockRejectedValue(errorKnow);
+      const result = await request(app.getHttpServer())
+        .post('/products')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name: `e2e test - ${uuid}-internal-server-error` });
+      expect(result.status).toEqual(400);
+      expect(result.body.message).toEqual('Error badRequest');
     });
 
     it('/products (POST) - throw Unauthorized (fake token)', async () => {
@@ -106,13 +139,23 @@ describe('testing products', () => {
     it('/products (GET) - throw internal server error', async () => {
       jest
         .spyOn(repository.products, 'findMany')
-        .mockRejectedValue(new Error('internal server error'));
+        .mockRejectedValue(errorUnknow);
       const result = await request(app.getHttpServer())
         .get('/products')
         .set('Authorization', `Bearer ${token}`);
 
       expect(result.status).toEqual(500);
-      expect(result.body.message).toEqual('internal server error');
+      expect(result.serverError).toEqual(true);
+    });
+
+    it('/products (GET) - throw Error badRequest', async () => {
+      jest.spyOn(repository.products, 'findMany').mockRejectedValue(errorKnow);
+      const result = await request(app.getHttpServer())
+        .get('/products')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(result.status).toEqual(400);
+      expect(result.body.message).toEqual('Error badRequest');
     });
 
     it('/products (GET) - throw Unauthorized (fake token)', async () => {
@@ -155,12 +198,23 @@ describe('testing products', () => {
     it('/products/:id (GET) - throw internal server error', async () => {
       jest
         .spyOn(repository.products, 'findUnique')
-        .mockRejectedValue(new Error('internal server error'));
+        .mockRejectedValue(errorUnknow);
       const result = await request(app.getHttpServer())
         .get(`/products/${idProduct}`)
         .set('Authorization', `Bearer ${token}`);
       expect(result.status).toEqual(500);
-      expect(result.body.message).toEqual('internal server error');
+      expect(result.serverError).toEqual(true);
+    });
+
+    it('/products/:id (GET) - throw Error badRequest', async () => {
+      jest
+        .spyOn(repository.products, 'findUnique')
+        .mockRejectedValue(errorKnow);
+      const result = await request(app.getHttpServer())
+        .get(`/products/${idProduct}`)
+        .set('Authorization', `Bearer ${token}`);
+      expect(result.status).toEqual(400);
+      expect(result.body.message).toEqual('Error badRequest');
     });
 
     it('/products/:id (GET) - throw Unauthorized (fake token)', async () => {
@@ -205,15 +259,23 @@ describe('testing products', () => {
     });
 
     it('/products/:id (PUT) - throw internal server error', async () => {
-      jest
-        .spyOn(repository.products, 'update')
-        .mockRejectedValue(new Error('internal server error'));
+      jest.spyOn(repository.products, 'update').mockRejectedValue(errorUnknow);
       const result = await request(app.getHttpServer())
         .put(`/products/${idProduct}`)
         .set('Authorization', `Bearer ${token}`)
         .send({ name: 'e2e test update', comment: 'e2e test commentaire' });
       expect(result.status).toEqual(500);
-      expect(result.body.message).toEqual('internal server error');
+      expect(result.serverError).toEqual(true);
+    });
+
+    it('/products/:id (PUT) - throw Error badRequest', async () => {
+      jest.spyOn(repository.products, 'update').mockRejectedValue(errorKnow);
+      const result = await request(app.getHttpServer())
+        .put(`/products/${idProduct}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name: 'e2e test update', comment: 'e2e test commentaire' });
+      expect(result.status).toEqual(400);
+      expect(result.body.message).toEqual('Error badRequest');
     });
 
     it('/products/:id (PUT) - throw Unauthorized (fake token)', async () => {
@@ -237,14 +299,21 @@ describe('testing products', () => {
 
   describe('delete product', () => {
     it('/products/:id (DELETE) - throw internal server error', async () => {
-      jest
-        .spyOn(repository.products, 'delete')
-        .mockRejectedValue(new Error('internal server error'));
+      jest.spyOn(repository.products, 'delete').mockRejectedValue(errorUnknow);
       const result = await request(app.getHttpServer())
         .delete(`/products/${idProduct}`)
         .set('Authorization', `Bearer ${token}`);
       expect(result.status).toEqual(500);
-      expect(result.body.message).toEqual('internal server error');
+      expect(result.serverError).toEqual(true);
+    });
+
+    it('/products/:id (DELETE) - throw Error badRequest', async () => {
+      jest.spyOn(repository.products, 'delete').mockRejectedValue(errorKnow);
+      const result = await request(app.getHttpServer())
+        .delete(`/products/${idProduct}`)
+        .set('Authorization', `Bearer ${token}`);
+      expect(result.status).toEqual(400);
+      expect(result.body.message).toEqual('Error badRequest');
     });
 
     it('/products/:id (DELETE) - throw Unauthorized (fake token)', async () => {

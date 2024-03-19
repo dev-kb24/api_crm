@@ -4,12 +4,26 @@ import * as request from 'supertest';
 import { AppModule } from '../../../src/app.module';
 import * as bcrypt from 'bcrypt';
 import { RepositoriesService } from '../../../src/repositories/repositories.service';
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientUnknownRequestError,
+} from '@prisma/client/runtime/library';
 
 describe('Testing Users', () => {
   let userId: string;
   let app: INestApplication;
   let token: string;
   let repository: RepositoriesService;
+  const errorUnknow = new PrismaClientUnknownRequestError(
+    'internal server error',
+    {
+      clientVersion: 'client version test',
+    },
+  );
+  const errorKnow = new PrismaClientKnownRequestError('Error badRequest', {
+    clientVersion: 'client version test',
+    code: 'test code',
+  });
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -88,14 +102,28 @@ describe('Testing Users', () => {
         lastname: `test`,
         code_email: '1001',
       };
-      jest
-        .spyOn(repository.users, 'create')
-        .mockRejectedValue(new Error('internal server error'));
+      jest.spyOn(repository.users, 'create').mockRejectedValue(errorUnknow);
       const result = await request(app.getHttpServer())
         .post('/users/signup')
         .send(user);
       expect(result.status).toEqual(500);
-      expect(result.body.message).toEqual('internal server error');
+      expect(result.serverError).toEqual(true);
+    });
+
+    it('/users/signup (POST) - throw error (badRequest)', async () => {
+      const user = {
+        email: 'test2@test.fr',
+        password: `Test@123`,
+        firstname: `test`,
+        lastname: `test`,
+        code_email: '1001',
+      };
+      jest.spyOn(repository.users, 'create').mockRejectedValue(errorKnow);
+      const result = await request(app.getHttpServer())
+        .post('/users/signup')
+        .send(user);
+      expect(result.status).toEqual(400);
+      expect(result.body.message).toEqual('Error badRequest');
     });
   });
 
@@ -144,15 +172,26 @@ describe('Testing Users', () => {
       const send = {
         code_email: '1001',
       };
-      jest
-        .spyOn(repository.users, 'update')
-        .mockRejectedValue(new Error('internal server error'));
+      jest.spyOn(repository.users, 'update').mockRejectedValue(errorUnknow);
       const result = await request(app.getHttpServer())
         .put(`/users/validation/${userId}`)
         .set('Authorization', `Bearer ${token}`)
         .send(send);
       expect(result.status).toEqual(500);
-      expect(result.body.message).toEqual('internal server error');
+      expect(result.serverError).toEqual(true);
+    });
+
+    it('/users/validation/:id (Validation Mail) -  throw error (badRequest)', async () => {
+      const send = {
+        code_email: '1001',
+      };
+      jest.spyOn(repository.users, 'update').mockRejectedValue(errorKnow);
+      const result = await request(app.getHttpServer())
+        .put(`/users/validation/${userId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(send);
+      expect(result.status).toEqual(400);
+      expect(result.body.message).toEqual('Error badRequest');
     });
   });
 
@@ -199,14 +238,25 @@ describe('Testing Users', () => {
         email: `test@test.fr`,
         password: `Test@123`,
       };
-      jest
-        .spyOn(repository.users, 'findFirst')
-        .mockRejectedValue(new Error('internal server error'));
+      jest.spyOn(repository.users, 'findFirst').mockRejectedValue(errorUnknow);
       const result = await request(app.getHttpServer())
         .post('/users/signin')
         .send(user);
       expect(result.status).toEqual(500);
-      expect(result.body.message).toEqual('internal server error');
+      expect(result.serverError).toEqual(true);
+    });
+
+    it('/users/signin (POST) - throw error (badRequest)', async () => {
+      const user = {
+        email: `test@test.fr`,
+        password: `Test@123`,
+      };
+      jest.spyOn(repository.users, 'findFirst').mockRejectedValue(errorKnow);
+      const result = await request(app.getHttpServer())
+        .post('/users/signin')
+        .send(user);
+      expect(result.status).toEqual(400);
+      expect(result.body.message).toEqual('Error badRequest');
     });
   });
 
@@ -230,14 +280,21 @@ describe('Testing Users', () => {
     });
 
     it('/users/getProfil/:id (GET) - throw error (internal server)', async () => {
-      jest
-        .spyOn(repository.users, 'findUnique')
-        .mockRejectedValue(new Error('internal server error'));
+      jest.spyOn(repository.users, 'findUnique').mockRejectedValue(errorUnknow);
       const result = await request(app.getHttpServer())
         .get(`/users/getProfil/${userId}`)
         .set('Authorization', `Bearer ${token}`);
       expect(result.status).toEqual(500);
-      expect(result.body.message).toEqual('internal server error');
+      expect(result.serverError).toEqual(true);
+    });
+
+    it('/users/getProfil/:id (GET) - throw error (badRequest)', async () => {
+      jest.spyOn(repository.users, 'findUnique').mockRejectedValue(errorKnow);
+      const result = await request(app.getHttpServer())
+        .get(`/users/getProfil/${userId}`)
+        .set('Authorization', `Bearer ${token}`);
+      expect(result.status).toEqual(400);
+      expect(result.body.message).toEqual('Error badRequest');
     });
 
     it('/users/getProfil/:id (GET) - throw error fake token (Unauthorized)', async () => {
@@ -290,15 +347,27 @@ describe('Testing Users', () => {
         oldPassword: `Test@456`,
         newPassword: `Test@123`,
       };
-      jest
-        .spyOn(repository.users, 'update')
-        .mockRejectedValue(new Error('internal server error'));
+      jest.spyOn(repository.users, 'update').mockRejectedValue(errorUnknow);
       const result = await request(app.getHttpServer())
         .put(`/users/password/${userId}`)
         .set('Authorization', `Bearer ${token}`)
         .send(updatepassword);
       expect(result.status).toEqual(500);
-      expect(result.body.message).toEqual('internal server error');
+      expect(result.serverError).toEqual(true);
+    });
+
+    it('/users/password/:id (PUT) - throw error (badRequest)', async () => {
+      const updatepassword = {
+        oldPassword: `Test@456`,
+        newPassword: `Test@123`,
+      };
+      jest.spyOn(repository.users, 'update').mockRejectedValue(errorKnow);
+      const result = await request(app.getHttpServer())
+        .put(`/users/password/${userId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(updatepassword);
+      expect(result.status).toEqual(400);
+      expect(result.body.message).toEqual('Error badRequest');
     });
 
     it('/users/password/:id (PUT) - throw error fake token (Unauthorized)', async () => {
@@ -365,15 +434,28 @@ describe('Testing Users', () => {
         firstname: 'test_1',
         lastname: 'test_1',
       };
-      jest
-        .spyOn(repository.users, 'update')
-        .mockRejectedValue(new Error('internal server error'));
+      jest.spyOn(repository.users, 'update').mockRejectedValue(errorUnknow);
       const result = await request(app.getHttpServer())
         .put(`/users/${userId}`)
         .set('Authorization', `Bearer ${token}`)
         .send(user);
       expect(result.status).toEqual(500);
-      expect(result.body.message).toEqual('internal server error');
+      expect(result.serverError).toEqual(true);
+    });
+
+    it('/users/:id (PUT) - throw error (badRequest)', async () => {
+      const user = {
+        email: 'test@test.fr',
+        firstname: 'test_1',
+        lastname: 'test_1',
+      };
+      jest.spyOn(repository.users, 'update').mockRejectedValue(errorKnow);
+      const result = await request(app.getHttpServer())
+        .put(`/users/${userId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(user);
+      expect(result.status).toEqual(400);
+      expect(result.body.message).toEqual('Error badRequest');
     });
 
     it('/users/:id (PUT) - throw error fake token (Unauthorized)', async () => {
@@ -441,14 +523,21 @@ describe('Testing Users', () => {
     });
 
     it('/users/:id (DELETE) - throw error (internal server)', async () => {
-      jest
-        .spyOn(repository.users, 'delete')
-        .mockRejectedValue(new Error('internal server error'));
+      jest.spyOn(repository.users, 'delete').mockRejectedValue(errorUnknow);
       const result = await request(app.getHttpServer())
         .delete(`/users/${userId}`)
         .set('Authorization', `Bearer ${token}`);
       expect(result.status).toEqual(500);
-      expect(result.body.message).toEqual('internal server error');
+      expect(result.serverError).toEqual(true);
+    });
+
+    it('/users/:id (DELETE) - throw error (badRequest)', async () => {
+      jest.spyOn(repository.users, 'delete').mockRejectedValue(errorKnow);
+      const result = await request(app.getHttpServer())
+        .delete(`/users/${userId}`)
+        .set('Authorization', `Bearer ${token}`);
+      expect(result.status).toEqual(400);
+      expect(result.body.message).toEqual('Error badRequest');
     });
 
     it('/users/:id (DELETE) - throw error fake token (Unauthorized)', async () => {

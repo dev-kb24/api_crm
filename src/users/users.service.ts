@@ -16,6 +16,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { MailService } from '@/mailer/mail.service';
 import { Users } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class UsersService {
@@ -60,7 +61,11 @@ export class UsersService {
         data: signupUserDto,
       });
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new BadRequestException(error.message);
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
     const dataMail = {
       email: signupUserDto.email,
@@ -136,7 +141,11 @@ export class UsersService {
         where: { userId: userId },
       });
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new BadRequestException(error.message);
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
     return user;
   }
@@ -162,7 +171,11 @@ export class UsersService {
         include: { order: true },
       });
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new BadRequestException(error.message);
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
     if (!user) {
       throw new NotFoundException(`UserId : ${userId} not found`);
@@ -177,7 +190,11 @@ export class UsersService {
         where: { email: email },
       });
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new BadRequestException(error.message);
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
 
     return user;
@@ -191,7 +208,11 @@ export class UsersService {
         include,
       });
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new BadRequestException(error.message);
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
   }
 }

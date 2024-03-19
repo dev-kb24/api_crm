@@ -8,14 +8,28 @@ import {
 import { RepositoriesService } from '@/repositories/repositories.service';
 import { RepositoriesServiceMock } from '@/repositories/mocks/repositories.service.mock';
 import {
+  BadRequestException,
   ConflictException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientUnknownRequestError,
+} from '@prisma/client/runtime/library';
 
 describe('SuppliersService', () => {
   let service: SuppliersService;
-
+  const errorKnow = new PrismaClientKnownRequestError('BadRequest error', {
+    clientVersion: 'test client version',
+    code: 'test code',
+  });
+  const errorUnKnow = new PrismaClientUnknownRequestError(
+    'internal server error',
+    {
+      clientVersion: 'client test version',
+    },
+  );
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -45,18 +59,33 @@ describe('SuppliersService', () => {
       }
     });
 
-    it('should create supplier - throw internal error', async () => {
+    it('should create supplier - throw internal error. (create 500)', async () => {
       service['repositoriesService']['suppliers']['findFirst'] = jest
         .fn()
         .mockResolvedValue(undefined);
       service['repositoriesService']['suppliers']['create'] = jest
         .fn()
-        .mockRejectedValue(new Error('internal error'));
+        .mockRejectedValue(errorUnKnow);
       try {
         await service.create(createSupplierDtoMock);
       } catch (error) {
         expect(error).toBeInstanceOf(InternalServerErrorException);
-        expect(error.message).toEqual('internal error');
+        expect(error.message).toEqual('internal server error');
+      }
+    });
+
+    it('should create supplier - throw internal error. (create 400)', async () => {
+      service['repositoriesService']['suppliers']['findFirst'] = jest
+        .fn()
+        .mockResolvedValue(undefined);
+      service['repositoriesService']['suppliers']['create'] = jest
+        .fn()
+        .mockRejectedValue(errorKnow);
+      try {
+        await service.create(createSupplierDtoMock);
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        expect(error.message).toEqual('BadRequest error');
       }
     });
   });
@@ -70,12 +99,24 @@ describe('SuppliersService', () => {
     it('should get all suppliers -  throw internal error', async () => {
       service['repositoriesService']['suppliers']['findMany'] = jest
         .fn()
-        .mockRejectedValue(new Error('internal error'));
+        .mockRejectedValue(errorUnKnow);
       try {
         await service.findAll();
       } catch (error) {
         expect(error).toBeInstanceOf(InternalServerErrorException);
-        expect(error.message).toEqual('internal error');
+        expect(error.message).toEqual('internal server error');
+      }
+    });
+
+    it('should get all suppliers -  throw bad request error', async () => {
+      service['repositoriesService']['suppliers']['findMany'] = jest
+        .fn()
+        .mockRejectedValue(errorKnow);
+      try {
+        await service.findAll();
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        expect(error.message).toEqual('BadRequest error');
       }
     });
 
@@ -101,12 +142,24 @@ describe('SuppliersService', () => {
     it('should get one supplier -  throw internal error', async () => {
       service['repositoriesService']['suppliers']['findUnique'] = jest
         .fn()
-        .mockRejectedValue(new Error('internal error'));
+        .mockRejectedValue(errorUnKnow);
       try {
         await service.findById(supplierEntityMock.suppliersId);
       } catch (error) {
         expect(error).toBeInstanceOf(InternalServerErrorException);
-        expect(error.message).toEqual('internal error');
+        expect(error.message).toEqual('internal server error');
+      }
+    });
+
+    it('should get one supplier -  throw bad request error', async () => {
+      service['repositoriesService']['suppliers']['findUnique'] = jest
+        .fn()
+        .mockRejectedValue(errorKnow);
+      try {
+        await service.findById(supplierEntityMock.suppliersId);
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        expect(error.message).toEqual('BadRequest error');
       }
     });
   });
@@ -123,7 +176,7 @@ describe('SuppliersService', () => {
     it('should update supplier - throw internal server error', async () => {
       service['repositoriesService']['suppliers']['update'] = jest
         .fn()
-        .mockRejectedValue(new Error('internal error'));
+        .mockRejectedValue(errorUnKnow);
       try {
         await service.update(
           supplierEntityMock.suppliersId,
@@ -131,7 +184,22 @@ describe('SuppliersService', () => {
         );
       } catch (error) {
         expect(error).toBeInstanceOf(InternalServerErrorException);
-        expect(error.message).toEqual('internal error');
+        expect(error.message).toEqual('internal server error');
+      }
+    });
+
+    it('should update supplier - throw bad request error', async () => {
+      service['repositoriesService']['suppliers']['update'] = jest
+        .fn()
+        .mockRejectedValue(errorKnow);
+      try {
+        await service.update(
+          supplierEntityMock.suppliersId,
+          updateSupplierDtoMock,
+        );
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        expect(error.message).toEqual('BadRequest error');
       }
     });
   });
@@ -145,12 +213,24 @@ describe('SuppliersService', () => {
     it('should delete supplier - throw internal server error', async () => {
       service['repositoriesService']['suppliers']['delete'] = jest
         .fn()
-        .mockRejectedValue(new Error('internal error'));
+        .mockRejectedValue(errorUnKnow);
       try {
         await service.delete(supplierEntityMock.suppliersId);
       } catch (error) {
         expect(error).toBeInstanceOf(InternalServerErrorException);
-        expect(error.message).toEqual('internal error');
+        expect(error.message).toEqual('internal server error');
+      }
+    });
+
+    it('should delete supplier - throw bad request error', async () => {
+      service['repositoriesService']['suppliers']['delete'] = jest
+        .fn()
+        .mockRejectedValue(errorKnow);
+      try {
+        await service.delete(supplierEntityMock.suppliersId);
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        expect(error.message).toEqual('BadRequest error');
       }
     });
   });

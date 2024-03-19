@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
@@ -8,6 +9,7 @@ import { RepositoriesService } from '@/repositories/repositories.service';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
 import { Suppliers } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class SuppliersService {
@@ -26,7 +28,11 @@ export class SuppliersService {
         data: createSupplierDto,
       });
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new BadRequestException(error.message);
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
   }
 
@@ -34,7 +40,11 @@ export class SuppliersService {
     try {
       return await this.repositoriesService.suppliers.findMany();
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new BadRequestException(error.message);
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
   }
 
@@ -45,7 +55,11 @@ export class SuppliersService {
         where: { suppliersId: supplierId },
       });
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new BadRequestException(error.message);
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
     if (!supplier) {
       throw new NotFoundException(`SupplierId : ${supplierId} not found`);
@@ -64,7 +78,11 @@ export class SuppliersService {
         data: updateSupplierDto,
       });
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new BadRequestException(error.message);
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
   }
 
@@ -75,7 +93,11 @@ export class SuppliersService {
         where: { suppliersId: supplierId },
       });
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new BadRequestException(error.message);
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
   }
 }

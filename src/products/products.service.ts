@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
@@ -8,6 +9,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { RepositoriesService } from '@/repositories/repositories.service';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Products } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class ProductsService {
@@ -15,17 +17,7 @@ export class ProductsService {
 
   async create(createProductDto: CreateProductDto): Promise<Products> {
     const { name } = createProductDto;
-    let productExist: Products;
-    try {
-      productExist = await this.repositoriesService.products.findFirst({
-        where: { name: name },
-      });
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-    if (productExist) {
-      throw new ConflictException('product already exist');
-    }
+    await this.findName(name);
     try {
       return await this.repositoriesService.products.create({
         data: {
@@ -39,7 +31,11 @@ export class ProductsService {
         include: { order: true },
       });
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new BadRequestException(error.message);
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
   }
 
@@ -55,7 +51,11 @@ export class ProductsService {
         include: { order: true },
       });
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new BadRequestException(error.message);
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
   }
 
@@ -67,7 +67,11 @@ export class ProductsService {
         include: { order: true },
       });
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new BadRequestException(error.message);
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
   }
 
@@ -79,7 +83,11 @@ export class ProductsService {
         include: { order: true },
       });
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new BadRequestException(error.message);
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
     if (!product) {
       throw new NotFoundException(`ProductId : ${productId} not found`);
@@ -93,7 +101,29 @@ export class ProductsService {
         include: { order: true },
       });
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new BadRequestException(error.message);
+      } else {
+        throw new InternalServerErrorException(error);
+      }
+    }
+  }
+
+  async findName(name: string): Promise<void> {
+    let productExist: Products;
+    try {
+      productExist = await this.repositoriesService.products.findFirst({
+        where: { name: name },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new BadRequestException(error.message);
+      } else {
+        throw new InternalServerErrorException(error);
+      }
+    }
+    if (productExist) {
+      throw new ConflictException('product already exist');
     }
   }
 }

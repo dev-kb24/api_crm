@@ -15,6 +15,7 @@ import {
   userEntityMock,
 } from '../../../src/users/mocks/users.entity.mock';
 import {
+  BadRequestException,
   ConflictException,
   InternalServerErrorException,
   NotFoundException,
@@ -22,10 +23,23 @@ import {
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { jwtServiceMock } from '../../../src/users/mocks/jwt.service.mock';
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientUnknownRequestError,
+} from '@prisma/client/runtime/library';
 
 describe('UsersService', () => {
   let service: UsersService;
-
+  const errorKnow = new PrismaClientKnownRequestError('BadRequest error', {
+    clientVersion: 'test client version',
+    code: 'test code',
+  });
+  const errorUnKnow = new PrismaClientUnknownRequestError(
+    'internal server error',
+    {
+      clientVersion: 'client test version',
+    },
+  );
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -61,22 +75,33 @@ describe('UsersService', () => {
       }
     });
 
-    it('Should return an error if the create function returns an error', async () => {
+    it('Should return an error if the create function returns an error. (create 500)', async () => {
       try {
         service['repositoriesService']['users']['findFirst'] = jest
           .fn()
           .mockResolvedValue(undefined);
         service['repositoriesService']['users']['create'] = jest
           .fn()
-          .mockRejectedValue(
-            new Error("error lors de la création du l'utilisateur"),
-          );
+          .mockRejectedValue(errorUnKnow);
         await service.signup(signupUserDtoMock);
       } catch (error) {
         expect(error).toBeInstanceOf(InternalServerErrorException);
-        expect(error.message).toEqual(
-          "error lors de la création du l'utilisateur",
-        );
+        expect(error.message).toEqual('internal server error');
+      }
+    });
+
+    it('Should return an error if the create function returns an error. (create 400)', async () => {
+      try {
+        service['repositoriesService']['users']['findFirst'] = jest
+          .fn()
+          .mockResolvedValue(undefined);
+        service['repositoriesService']['users']['create'] = jest
+          .fn()
+          .mockRejectedValue(errorKnow);
+        await service.signup(signupUserDtoMock);
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        expect(error.message).toEqual('BadRequest error');
       }
     });
 
@@ -208,15 +233,27 @@ describe('UsersService', () => {
       }
     });
 
-    it('Should return an error if the update function returns an error.', async () => {
+    it('Should return an error if the update function returns an error. (update 500)', async () => {
       try {
         service['repositoriesService']['users']['update'] = jest
           .fn()
-          .mockRejectedValue(new Error('error update'));
+          .mockRejectedValue(errorUnKnow);
         await service.updateUser({ userId: '123456' }, { test: 'test' });
       } catch (error) {
         expect(error).toBeInstanceOf(InternalServerErrorException);
-        expect(error.message).toEqual(`error update`);
+        expect(error.message).toEqual('internal server error');
+      }
+    });
+
+    it('Should return an error if the update function returns an error. (update 400)', async () => {
+      try {
+        service['repositoriesService']['users']['update'] = jest
+          .fn()
+          .mockRejectedValue(errorKnow);
+        await service.updateUser({ userId: '123456' }, { test: 'test' });
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        expect(error.message).toEqual(`BadRequest error`);
       }
     });
   });
@@ -241,28 +278,50 @@ describe('UsersService', () => {
       expect(user).toEqual(userEntityMock);
     });
 
-    it('Should return an error if the findfirst function returns an error.', async () => {
+    it('Should return an error if the findfirst function returns an error. (findFirst 500)', async () => {
       try {
         service['repositoriesService']['users']['findFirst'] = jest
           .fn()
-          .mockRejectedValue(
-            new Error("error lors de la rechercher de l'email"),
-          );
+          .mockRejectedValue(errorUnKnow);
         await service.findByEmail('test@test.fr');
       } catch (error) {
         expect(error).toBeInstanceOf(InternalServerErrorException);
-        expect(error.message).toEqual(`error lors de la rechercher de l'email`);
+        expect(error.message).toEqual(`internal server error`);
       }
     });
-    it('Should return an error if the findUnique function returns an error.', async () => {
+
+    it('Should return an error if the findfirst function returns an error. (findFirst 400)', async () => {
+      try {
+        service['repositoriesService']['users']['findFirst'] = jest
+          .fn()
+          .mockRejectedValue(errorKnow);
+        await service.findByEmail('test@test.fr');
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        expect(error.message).toEqual(`BadRequest error`);
+      }
+    });
+    it('Should return an error if the findUnique function returns an error. (findUnique 500)', async () => {
       try {
         service['repositoriesService']['users']['findUnique'] = jest
           .fn()
-          .mockRejectedValue(new Error('error findUnique'));
+          .mockRejectedValue(errorUnKnow);
         await service.findById('123456789');
       } catch (error) {
         expect(error).toBeInstanceOf(InternalServerErrorException);
-        expect(error.message).toEqual(`error findUnique`);
+        expect(error.message).toEqual(`internal server error`);
+      }
+    });
+
+    it('Should return an error if the findUnique function returns an error. (findUnique 400)', async () => {
+      try {
+        service['repositoriesService']['users']['findUnique'] = jest
+          .fn()
+          .mockRejectedValue(errorKnow);
+        await service.findById('123456789');
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        expect(error.message).toEqual(`BadRequest error`);
       }
     });
   });
@@ -273,15 +332,27 @@ describe('UsersService', () => {
       expect(user).toEqual(userEntityMock);
     });
 
-    it('Should return an error if the delete function returns an error.', async () => {
+    it('Should return an error if the delete function returns an error. (delete 500)', async () => {
       try {
         service['repositoriesService']['users']['delete'] = jest
           .fn()
-          .mockRejectedValue(new Error('error function delete'));
+          .mockRejectedValue(errorUnKnow);
         await service.delete(userEntityMock.userId);
       } catch (error) {
         expect(error).toBeInstanceOf(InternalServerErrorException);
-        expect(error.message).toEqual(`error function delete`);
+        expect(error.message).toEqual(`internal server error`);
+      }
+    });
+
+    it('Should return an error if the delete function returns an error. (delete 400)', async () => {
+      try {
+        service['repositoriesService']['users']['delete'] = jest
+          .fn()
+          .mockRejectedValue(errorKnow);
+        await service.delete(userEntityMock.userId);
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        expect(error.message).toEqual(`BadRequest error`);
       }
     });
   });

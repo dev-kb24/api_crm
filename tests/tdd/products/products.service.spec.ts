@@ -7,14 +7,28 @@ import {
   createProductDtoMock,
 } from '../../../src/products/mocks/product.entity.mock';
 import {
+  BadRequestException,
   ConflictException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientUnknownRequestError,
+} from '@prisma/client/runtime/library';
 
 describe('ProductsService', () => {
   let service: ProductsService;
-
+  const errorKnow = new PrismaClientKnownRequestError('BadRequest error', {
+    clientVersion: 'test client version',
+    code: 'test code',
+  });
+  const errorUnKnow = new PrismaClientUnknownRequestError(
+    'internal server error',
+    {
+      clientVersion: 'client test version',
+    },
+  );
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -65,14 +79,14 @@ describe('ProductsService', () => {
       }
     });
 
-    it('Should return an error if the create function returns an error.', async () => {
+    it('Should return an error if the create function returns an error. (create 500)', async () => {
       try {
         service['repositoriesService']['products']['findFirst'] = jest
           .fn()
           .mockResolvedValue(undefined);
         service['repositoriesService']['products']['create'] = jest
           .fn()
-          .mockRejectedValue(new Error('internal server error'));
+          .mockRejectedValue(errorUnKnow);
         await service.create(createProductDtoMock);
       } catch (error) {
         expect(error).toBeInstanceOf(InternalServerErrorException);
@@ -80,15 +94,42 @@ describe('ProductsService', () => {
       }
     });
 
-    it('Should return an error if the create function returns an error.', async () => {
+    it('Should return an error if the create function returns an error. (create 400)', async () => {
       try {
         service['repositoriesService']['products']['findFirst'] = jest
           .fn()
-          .mockRejectedValue(new Error('internal server error'));
+          .mockResolvedValue(undefined);
+        service['repositoriesService']['products']['create'] = jest
+          .fn()
+          .mockRejectedValue(errorKnow);
+        await service.create(createProductDtoMock);
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        expect(error.message).toEqual('BadRequest error');
+      }
+    });
+
+    it('Should return an error if the create function returns an error. (findFirst 500)', async () => {
+      try {
+        service['repositoriesService']['products']['findFirst'] = jest
+          .fn()
+          .mockRejectedValue(errorUnKnow);
         await service.create(createProductDtoMock);
       } catch (error) {
         expect(error).toBeInstanceOf(InternalServerErrorException);
         expect(error.message).toEqual('internal server error');
+      }
+    });
+
+    it('Should return an error if the create function returns an error. (findFirst 400)', async () => {
+      try {
+        service['repositoriesService']['products']['findFirst'] = jest
+          .fn()
+          .mockRejectedValue(errorKnow);
+        await service.create(createProductDtoMock);
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        expect(error.message).toEqual('BadRequest error');
       }
     });
   });
@@ -121,11 +162,11 @@ describe('ProductsService', () => {
       }
     });
 
-    it('should return error if findUnique return an error', async () => {
+    it('should return error if findUnique return an error, (findUnique 500)', async () => {
       try {
         service['repositoriesService']['products']['findUnique'] = jest
           .fn()
-          .mockRejectedValue(new Error('internal server error'));
+          .mockRejectedValue(errorUnKnow);
         await service.findById(productEntityMock.productId);
       } catch (error) {
         expect(error).toBeInstanceOf(InternalServerErrorException);
@@ -133,15 +174,39 @@ describe('ProductsService', () => {
       }
     });
 
-    it('should return error if findMany return an error', async () => {
+    it('should return error if findUnique return an error, (findUnique 400)', async () => {
+      try {
+        service['repositoriesService']['products']['findUnique'] = jest
+          .fn()
+          .mockRejectedValue(errorKnow);
+        await service.findById(productEntityMock.productId);
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        expect(error.message).toEqual('BadRequest error');
+      }
+    });
+
+    it('should return error if findMany return an error. (findMany 500)', async () => {
       try {
         service['repositoriesService']['products']['findMany'] = jest
           .fn()
-          .mockRejectedValue(new Error('internal server error'));
+          .mockRejectedValue(errorUnKnow);
         await service.findAll();
       } catch (error) {
         expect(error).toBeInstanceOf(InternalServerErrorException);
         expect(error.message).toEqual('internal server error');
+      }
+    });
+
+    it('should return error if findMany return an error. (findMany 400)', async () => {
+      try {
+        service['repositoriesService']['products']['findMany'] = jest
+          .fn()
+          .mockRejectedValue(errorKnow);
+        await service.findAll();
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        expect(error.message).toEqual('BadRequest error');
       }
     });
   });
@@ -169,15 +234,27 @@ describe('ProductsService', () => {
       }
     });
 
-    it('should return error if update return an error', async () => {
+    it('should return error if update return an error (update 500)', async () => {
       try {
         service['repositoriesService']['products']['update'] = jest
           .fn()
-          .mockRejectedValue(new Error('internal server error'));
+          .mockRejectedValue(errorUnKnow);
         await service.update(createProductDtoMock, productEntityMock.productId);
       } catch (error) {
         expect(error).toBeInstanceOf(InternalServerErrorException);
         expect(error.message).toEqual('internal server error');
+      }
+    });
+
+    it('should return error if update return an error (update 400)', async () => {
+      try {
+        service['repositoriesService']['products']['update'] = jest
+          .fn()
+          .mockRejectedValue(errorKnow);
+        await service.update(createProductDtoMock, productEntityMock.productId);
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        expect(error.message).toEqual('BadRequest error');
       }
     });
   });
@@ -202,15 +279,27 @@ describe('ProductsService', () => {
       }
     });
 
-    it('should return error if delete return an error', async () => {
+    it('should return error if delete return an error (delete 500)', async () => {
       try {
         service['repositoriesService']['products']['delete'] = jest
           .fn()
-          .mockRejectedValue(new Error('internal server error'));
+          .mockRejectedValue(errorUnKnow);
         await service.delete(productEntityMock.productId);
       } catch (error) {
         expect(error).toBeInstanceOf(InternalServerErrorException);
         expect(error.message).toEqual('internal server error');
+      }
+    });
+
+    it('should return error if delete return an error (delete 400)', async () => {
+      try {
+        service['repositoriesService']['products']['delete'] = jest
+          .fn()
+          .mockRejectedValue(errorKnow);
+        await service.delete(productEntityMock.productId);
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        expect(error.message).toEqual('BadRequest error');
       }
     });
   });
