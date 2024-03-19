@@ -128,7 +128,7 @@ describe('UsersService', () => {
         await service.signin(signinUserDtoMock);
       } catch (error) {
         expect(error).toBeInstanceOf(UnauthorizedException);
-        expect(error.message).toEqual('Votre compte n\'a pas été validé');
+        expect(error.message).toEqual("Votre compte n'a pas été validé");
       }
     });
 
