@@ -46,11 +46,13 @@ export class CreateOrderDto {
   @IsArray()
   @IsNotEmpty()
   @ApiProperty()
+  @IsOptional()
   readonly usersId: string[];
 
   @IsArray()
   @IsNotEmpty()
   @ApiProperty()
+  @IsOptional()
   readonly productsId: string[];
 
   @ValidateNested({ each: true })

@@ -2,12 +2,13 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { RepositoriesService } from '@/repositories/repositories.service';
-import { Order } from '@prisma/client';
+import { Order, Prisma } from '@prisma/client';
 
 @Injectable()
 export class OrderService {
@@ -15,7 +16,6 @@ export class OrderService {
 
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
     const { name } = createOrderDto;
-
     await this.searchName(name);
 
     try {
@@ -23,32 +23,53 @@ export class OrderService {
         data: {
           ...createOrderDto,
           products: {
-            connect: createOrderDto.productsId.map((productId) => ({
+            connect: createOrderDto?.productsId?.map((productId) => ({
               productId,
             })),
           },
           users: {
-            connect: createOrderDto.usersId.map((userId) => ({ userId })),
+            connect: createOrderDto?.usersId?.map((userId) => ({ userId })),
           },
         },
         include: { products: true, users: true },
       });
     } catch (error) {
-      throw new BadRequestException(error);
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new BadRequestException(error);
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
   }
 
   async findAll(): Promise<Order[]> {
-    return await this.repositoriesService.order.findMany({
-      include: { products: true, users: true },
-    });
+    try {
+      return await this.repositoriesService.order.findMany({
+        include: { products: true, users: true },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new BadRequestException(error);
+      } else {
+        throw new InternalServerErrorException(error);
+      }
+    }
   }
 
   async findById(orderId: string): Promise<Order> {
-    const order = await this.repositoriesService.order.findUnique({
-      where: { orderId: orderId },
-      include: { users: true, products: true },
-    });
+    let order: Order;
+    try {
+      order = await this.repositoriesService.order.findUnique({
+        where: { orderId: orderId },
+        include: { users: true, products: true },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new BadRequestException(error);
+      } else {
+        throw new InternalServerErrorException(error);
+      }
+    }
     if (!order) {
       throw new NotFoundException(`OrderId : ${orderId} not found`);
     }
@@ -65,16 +86,22 @@ export class OrderService {
         data: {
           ...updateOrderDto,
           products: {
-            set: updateOrderDto.productsId.map((productId) => ({ productId })),
+            set: updateOrderDto?.productsId?.map((productId) => ({
+              productId,
+            })),
           },
           users: {
-            set: updateOrderDto.usersId.map((userId) => ({ userId })),
+            set: updateOrderDto?.usersId?.map((userId) => ({ userId })),
           },
         },
         include: { products: true, users: true },
       });
     } catch (error) {
-      throw new BadRequestException(error);
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new BadRequestException(error);
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
   }
 
@@ -85,14 +112,27 @@ export class OrderService {
         include: { products: true, users: true },
       });
     } catch (error) {
-      throw new BadRequestException(error);
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new BadRequestException(error);
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
   }
 
-  private async searchName(name: string): Promise<void> {
-    const orderNameExist = await this.repositoriesService.order.findFirst({
-      where: { name: name },
-    });
+  async searchName(name: string): Promise<void> {
+    let orderNameExist: Order;
+    try {
+      orderNameExist = await this.repositoriesService.order.findFirst({
+        where: { name: name },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new BadRequestException(error);
+      } else {
+        throw new InternalServerErrorException(error);
+      }
+    }
     if (orderNameExist) {
       throw new ConflictException('order name already exist');
     }
