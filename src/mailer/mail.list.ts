@@ -7,5 +7,14 @@ const listMail = {
       url: `${config.protocol}${config.url}:${config.port}/validation/${user.userId}`,
     };
   },
+  forgot_mail: (user: any, config: any) => {
+    return {
+      subject: `Réinitialisation du mot de passe`,
+      message: `Voici le mail pour réinitialiser le mot de passe de votre compte`,
+      message_lien:
+        'Cliquez sur ce lien pour réinitialiser votre mot de passe : ',
+      url: `${config.protocol}${config.url}:${config.port}/forgot/${user.userId}`,
+    };
+  },
 };
 export default listMail;

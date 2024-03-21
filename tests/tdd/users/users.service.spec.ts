@@ -356,4 +356,23 @@ describe('UsersService', () => {
       }
     });
   });
+
+  describe('forgot password', () => {
+    it('should be send an email', async () => {
+      const user = await service.forgot('test@test.fr');
+      expect(user).toEqual(userEntityMock);
+    });
+
+    it('should return an error (notfound error)', async () => {
+      service['repositoriesService']['users']['findFirst'] = jest
+        .fn()
+        .mockResolvedValue(null);
+      try {
+        await service.forgot('test@test.fr');
+      } catch (error) {
+        expect(error).toBeInstanceOf(NotFoundException);
+        expect(error.message).toEqual(`email not found`);
+      }
+    });
+  });
 });

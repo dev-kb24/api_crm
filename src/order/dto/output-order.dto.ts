@@ -2,7 +2,7 @@ import { OutputProductDto } from '@/products/dto/output-product.dto';
 import { OutputUserDto } from '@/users/dto/output-user.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { Address, Pictures, Products, Users } from '@prisma/client';
-import { Exclude, Transform } from 'class-transformer';
+import { Exclude, Transform, plainToInstance } from 'class-transformer';
 
 export class OutputOrderDto {
   @ApiProperty()
@@ -28,7 +28,9 @@ export class OutputOrderDto {
   @Exclude()
   readonly productsId: Array<string>;
 
-  @Transform(({ value }) => value.map((user: Users) => new OutputUserDto(user)))
+  @Transform(({ value }) =>
+    value.map((user: Users) => plainToInstance(OutputUserDto, user)),
+  )
   readonly users: Array<Users>;
 
   @Transform(({ value }) =>
