@@ -29,7 +29,20 @@ export const expectedUserEntityMock: any = {
   email: 'test@test.fr',
   firstname: 'firstname',
   lastname: 'lastname',
-  code_email: 1234,
+  avatar: {
+    pictureMock,
+  },
+  civility: 1,
+  fonction: 'test',
+  order: [],
+};
+
+export const reqMock: any = {
+  user: {
+    sub: {
+      userEntityMock,
+    },
+  },
 };
 
 export const signupUserDtoMock: SignupUserDto = {
@@ -64,4 +77,9 @@ export const updateUserDtoMock: SignupUserDto = {
 export const updateUserPasswordDtoMock: UpdateUserPasswordDto = {
   oldPassword: 'password',
   newPassword: 'newPassword',
+};
+
+export const OutputSigninDtoMock: any = {
+  access_token: 'fake_token',
+  user: expectedUserEntityMock,
 };

@@ -12,6 +12,8 @@ import {
   updateUserDtoMock,
   updateUserPasswordDtoMock,
   userEntityMock,
+  reqMock,
+  OutputSigninDtoMock,
 } from '../../../src/users/mocks/users.entity.mock';
 
 describe('UsersController', () => {
@@ -39,7 +41,7 @@ describe('UsersController', () => {
   it('should signin user', async () => {
     const user = await controller.signin(signinUserDtoMock);
     expect(user).toBeDefined();
-    expect(user).toEqual(expectedUserEntityMock);
+    expect(user).toEqual(OutputSigninDtoMock);
   });
 
   it('should get one user', async () => {
@@ -72,13 +74,19 @@ describe('UsersController', () => {
     expect(user).toEqual("L'utilisateur a été supprimé");
   });
 
-  it('should can access to the route', () => {
-    const result = controller.access();
-    expect(result).toEqual('Vous etes Autorisé !');
+  it('should can access to the route', async () => {
+    const user = await controller.access(reqMock);
+    expect(user).toBeDefined();
+    expect(user).toEqual(expectedUserEntityMock);
   });
 
   it('should can valide user', async () => {
     const result = await controller.validation('1234', '1234567891234567');
     expect(result).toEqual('Votre compte est validé');
+  });
+
+  it('should be able to send email for forgotten password', async () => {
+    const result = await controller.forgot('mail@mail.fr');
+    expect(result).toEqual('Un email à été envoyé!');
   });
 });

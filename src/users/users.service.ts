@@ -92,11 +92,12 @@ export class UsersService {
     if (!(await bcrypt.compare(password, userExist.password))) {
       throw new UnauthorizedException('Le mot de passe est incorrect');
     }
-    const payload = { sub: userExist.userId };
+    const payload = { sub: userExist };
 
     return {
       access_token: await this.jwtService.signAsync(payload),
       user: userExist,
+      caca: 'test',
     };
   }
 
@@ -215,5 +216,20 @@ export class UsersService {
         throw new InternalServerErrorException(error);
       }
     }
+  }
+
+  async forgot(email: string): Promise<Users> {
+    const user: Users = await this.findByEmail(email);
+
+    if (!user) {
+      throw new NotFoundException(`email not found`);
+    }
+
+    const dataMail = {
+      email: user.email,
+      userId: user.userId,
+    };
+    await this.mailService.sendEmail(dataMail, 'forgot mail', 'forgot_mail');
+    return user;
   }
 }

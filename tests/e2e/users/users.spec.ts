@@ -493,7 +493,7 @@ describe('Testing Users', () => {
         .get(`/users/access/`)
         .set('Authorization', `Bearer ${token}`);
       expect(result.status).toEqual(200);
-      expect(result.text).toEqual('Vous etes Autorisé !');
+      expect(result.body).toHaveProperty('userId');
     });
 
     it('/users/access (Access user) - throw error fake token (Unauthorized)', async () => {
@@ -509,6 +509,42 @@ describe('Testing Users', () => {
       const result = await request(app.getHttpServer()).get(`/users/access/`);
       expect(result.status).toEqual(401);
       expect(result.body.message).toEqual('Unauthorized');
+    });
+  });
+
+  describe('forgot email', () => {
+    it('/users/forgot (forgotten email)', async () => {
+      const result = await request(app.getHttpServer())
+        .post(`/users/forgot/`)
+        .send({ email: 'test@test.fr' });
+      expect(result.status).toEqual(200);
+      expect(result.text).toEqual('Un email à été envoyé!');
+    });
+
+    it('/users/forgot (forgotten email) - throw error not found email', async () => {
+      const result = await request(app.getHttpServer())
+        .post(`/users/forgot/`)
+        .send({ email: 'test2@test.fr' });
+      expect(result.status).toEqual(404);
+      expect(result.body.message).toEqual('email not found');
+    });
+
+    it('/users/forgot (forgotten email) - throw error (internal server)', async () => {
+      jest.spyOn(repository.users, 'findFirst').mockRejectedValue(errorUnknow);
+      const result = await request(app.getHttpServer())
+        .post(`/users/forgot/`)
+        .send({ email: 'test@test.fr' });
+      expect(result.status).toEqual(500);
+      expect(result.serverError).toEqual(true);
+    });
+
+    it('/users/forgot (forgotten email) - throw error (badRequest)', async () => {
+      jest.spyOn(repository.users, 'findFirst').mockRejectedValue(errorKnow);
+      const result = await request(app.getHttpServer())
+        .post(`/users/forgot/`)
+        .send({ email: 'test@test.fr' });
+      expect(result.status).toEqual(400);
+      expect(result.body.message).toEqual('Error badRequest');
     });
   });
 
