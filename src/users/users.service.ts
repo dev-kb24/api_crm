@@ -70,6 +70,7 @@ export class UsersService {
     const dataMail = {
       email: signupUserDto.email,
       code_email: code_email,
+      userId: user.userId,
     };
     await this.mailService.sendEmail(dataMail, 'user Created', 'create_user');
 
