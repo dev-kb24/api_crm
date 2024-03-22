@@ -51,7 +51,6 @@ export const expectedProductEntityMock: any = {
   height: 11.0,
   width: 12.0,
   length: 13.0,
-  ordersId: ['1234567891234567'],
   categories: [categoriesMock],
   order: [],
 };

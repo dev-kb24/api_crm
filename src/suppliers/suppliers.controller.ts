@@ -20,6 +20,7 @@ import {
   ApiNoContentResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('suppliers')
 @ApiTags('Suppliers')
@@ -34,7 +35,8 @@ export class SuppliersController {
   async create(
     @Body() createSupplierDto: CreateSupplierDto,
   ): Promise<OutputSupplierDto> {
-    return new OutputSupplierDto(
+    return plainToInstance(
+      OutputSupplierDto,
       await this.suppliersService.create(createSupplierDto),
     );
   }
@@ -48,7 +50,9 @@ export class SuppliersController {
   })
   async findAll(): Promise<OutputSupplierDto[]> {
     const suppliers = await this.suppliersService.findAll();
-    return suppliers.map((supplier) => new OutputSupplierDto(supplier));
+    return suppliers.map((supplier) =>
+      plainToInstance(OutputSupplierDto, supplier),
+    );
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -56,7 +60,8 @@ export class SuppliersController {
   @Get(':id')
   @ApiOkResponse({ description: 'Opération réussie', type: OutputSupplierDto })
   async findById(@Param('id') supplierId: string): Promise<OutputSupplierDto> {
-    return new OutputSupplierDto(
+    return plainToInstance(
+      OutputSupplierDto,
       await this.suppliersService.findById(supplierId),
     );
   }
@@ -70,7 +75,8 @@ export class SuppliersController {
     @Param('id') supplierId: string,
     @Body() createSupplierDto: CreateSupplierDto,
   ): Promise<OutputSupplierDto> {
-    return new OutputSupplierDto(
+    return plainToInstance(
+      OutputSupplierDto,
       await this.suppliersService.update(supplierId, createSupplierDto),
     );
   }
