@@ -13,8 +13,4 @@ export class OutputSupplierDto {
   readonly coordonnees: Coordonnees;
   readonly supplier_contact: Supplier_contact[];
   readonly legal: Legal;
-
-  constructor(partial: Partial<OutputSupplierDto>) {
-    Object.assign(this, partial);
-  }
 }

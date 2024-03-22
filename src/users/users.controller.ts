@@ -42,7 +42,6 @@ export class UsersController {
     return plainToInstance(
       OutputUserDto,
       await this.userService.signup(signupUserDto),
-      { excludeExtraneousValues: true },
     );
   }
 
@@ -55,7 +54,6 @@ export class UsersController {
     return plainToInstance(
       OutputSigninDto,
       await this.userService.signin(signinUserDto),
-      { excludeExtraneousValues: true },
     );
   }
 
@@ -80,7 +78,6 @@ export class UsersController {
     return plainToInstance(
       OutputUserDto,
       await this.userService.getProfil(userId),
-      { excludeExtraneousValues: true },
     );
   }
 
@@ -96,7 +93,6 @@ export class UsersController {
     return plainToInstance(
       OutputUserDto,
       await this.userService.update(updateUserDto, userId),
-      { excludeExtraneousValues: true },
     );
   }
 
@@ -115,9 +111,7 @@ export class UsersController {
   @ApiOkResponse({ description: 'Opération réussie', type: OutputUserDto })
   async access(@Req() req: any): Promise<OutputUserDto> {
     const user: Users = await this.userService.getProfil(req.user.sub.userId);
-    return plainToInstance(OutputUserDto, user, {
-      excludeExtraneousValues: true,
-    });
+    return plainToInstance(OutputUserDto, user);
   }
 
   @UseInterceptors(ClassSerializerInterceptor)

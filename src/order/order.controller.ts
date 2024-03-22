@@ -21,6 +21,7 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { plainToInstance } from 'class-transformer';
 
 @ApiTags('order')
 @Controller('order')
@@ -35,7 +36,10 @@ export class OrderController {
   async create(
     @Body() createOrderDto: CreateOrderDto,
   ): Promise<OutputOrderDto> {
-    return new OutputOrderDto(await this.orderService.create(createOrderDto));
+    return plainToInstance(
+      OutputOrderDto,
+      await this.orderService.create(createOrderDto),
+    );
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -44,7 +48,7 @@ export class OrderController {
   @ApiOkResponse({ description: 'Opération réussie', type: [OutputOrderDto] })
   async findAll(): Promise<OutputOrderDto[]> {
     const orders = await this.orderService.findAll();
-    return orders.map((order) => new OutputOrderDto(order));
+    return orders.map((order) => plainToInstance(OutputOrderDto, order));
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -52,7 +56,10 @@ export class OrderController {
   @Get(':id')
   @ApiOkResponse({ description: 'Opération réussie', type: OutputOrderDto })
   async findOne(@Param('id') orderId: string) {
-    return new OutputOrderDto(await this.orderService.findById(orderId));
+    return plainToInstance(
+      OutputOrderDto,
+      await this.orderService.findById(orderId),
+    );
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -64,7 +71,8 @@ export class OrderController {
     @Param('id') orderId: string,
     @Body() updateOrderDto: UpdateOrderDto,
   ): Promise<OutputOrderDto> {
-    return new OutputOrderDto(
+    return plainToInstance(
+      OutputOrderDto,
       await this.orderService.update(orderId, updateOrderDto),
     );
   }

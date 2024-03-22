@@ -1,4 +1,4 @@
-import { Exclude, Transform } from 'class-transformer';
+import { Exclude, Transform, plainToInstance } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { Categories, Order, Pictures, References } from '@prisma/client';
 import { OutputOrderDto } from '@/order/dto/output-order.dto';
@@ -33,13 +33,9 @@ export class OutputProductDto {
   readonly ordersId: Array<string>;
   @ApiProperty()
   @Transform(({ value }) =>
-    value.map((order: Order) => new OutputOrderDto(order)),
+    value.map((order: Order) => plainToInstance(OutputOrderDto, order)),
   )
   readonly order: Array<Order>;
   @ApiProperty()
   readonly categories: Array<Categories>;
-
-  constructor(partial: Partial<OutputProductDto>) {
-    Object.assign(this, partial);
-  }
 }

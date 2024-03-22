@@ -23,6 +23,7 @@ import { ProductsService } from './products.service';
 import { OutputProductDto } from './dto/output-product.dto';
 import { UsersGuard } from '@/users/users.guard';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { plainToInstance } from 'class-transformer';
 
 @ApiTags('products')
 @Controller('products')
@@ -37,7 +38,8 @@ export class ProductsController {
   async create(
     @Body() createProductDto: CreateProductDto,
   ): Promise<OutputProductDto> {
-    return new OutputProductDto(
+    return plainToInstance(
+      OutputProductDto,
       await this.productsService.create(createProductDto),
     );
   }
@@ -51,7 +53,8 @@ export class ProductsController {
     @Body() updateProductDto: UpdateProductDto,
     @Param('id') productId: string,
   ): Promise<OutputProductDto> {
-    return new OutputProductDto(
+    return plainToInstance(
+      OutputProductDto,
       await this.productsService.update(updateProductDto, productId),
     );
   }
@@ -70,7 +73,9 @@ export class ProductsController {
   @ApiOkResponse({ description: 'Opération réussie', type: [OutputProductDto] })
   async findAll(): Promise<OutputProductDto[]> {
     const products = await this.productsService.findAll();
-    return products.map((product) => new OutputProductDto(product));
+    return products.map((product) =>
+      plainToInstance(OutputProductDto, product),
+    );
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -78,6 +83,9 @@ export class ProductsController {
   @Get(':id')
   @ApiOkResponse({ description: 'Opération réussie', type: OutputProductDto })
   async findById(@Param('id') productId: string): Promise<OutputProductDto> {
-    return new OutputProductDto(await this.productsService.findById(productId));
+    return plainToInstance(
+      OutputProductDto,
+      await this.productsService.findById(productId),
+    );
   }
 }

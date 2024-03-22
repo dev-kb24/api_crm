@@ -34,15 +34,13 @@ export class OutputOrderDto {
   readonly users: Array<Users>;
 
   @Transform(({ value }) =>
-    value.map((product: Products) => new OutputProductDto(product)),
+    value.map((product: Products) =>
+      plainToInstance(OutputProductDto, product),
+    ),
   )
   readonly products: Array<Products>;
 
   readonly address: Address;
   readonly picture_before: Pictures[];
   readonly picture_after: Pictures[];
-
-  constructor(partial: Partial<OutputOrderDto>) {
-    Object.assign(this, partial);
-  }
 }
