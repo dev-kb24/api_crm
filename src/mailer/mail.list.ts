@@ -13,7 +13,7 @@ const listMail = {
       message: `Voici le mail pour réinitialiser le mot de passe de votre compte`,
       message_lien:
         'Cliquez sur ce lien pour réinitialiser votre mot de passe : ',
-      url: `${config.protocol}${config.url}:${config.port}/forgot/${user.userId}`,
+      url: `${config.protocol}${config.url}:${config.port}/password/${user.userId}`,
     };
   },
 };
